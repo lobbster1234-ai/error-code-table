@@ -31,8 +31,8 @@
 
 #bulkInput:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #8DB600;
+    box-shadow: 0 0 0 3px rgba(141, 182, 0, 0.1);
 }
 
 .button-group {
@@ -42,7 +42,7 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
     color: white;
     border: none;
     padding: 15px 40px;
@@ -55,7 +55,7 @@
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 20px rgba(141, 182, 0, 0.4);
 }
 
 .btn-secondary {
@@ -157,7 +157,7 @@
 .table-header {
     display: grid;
     grid-template-columns: 150px 120px 1fr 150px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
     color: white;
     font-weight: bold;
     padding: 15px;
@@ -191,7 +191,7 @@
 .col-code {
     font-family: 'Courier New', monospace;
     font-weight: bold;
-    color: #667eea;
+    color: #8DB600;
 }
 
 .col-desc {
@@ -327,12 +327,12 @@
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #8DB600;
 }
 
 .btn-submit {
     width: 100%;
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
     color: white;
     border: none;
     padding: 15px;
@@ -345,7 +345,7 @@
 
 .btn-submit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(40, 167, 69, 0.4);
+    box-shadow: 0 5px 20px rgba(141, 182, 0, 0.4);
 }
 
 /* Export Section */
@@ -357,7 +357,7 @@
 }
 
 .btn-export {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
     color: white;
     border: none;
     padding: 15px 40px;
@@ -370,7 +370,7 @@
 
 .btn-export:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(23, 162, 184, 0.4);
+    box-shadow: 0 5px 20px rgba(141, 182, 0, 0.4);
 }
 
 /* Animations */

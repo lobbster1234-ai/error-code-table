@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
     min-height: 100vh;
     padding: 20px;
     color: #333;
@@ -22,7 +22,7 @@ body {
 }
 
 header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
     color: white;
     padding: 40px;
     text-align: center;
@@ -64,8 +64,8 @@ header h1 {
 
 #searchInput:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    border-color: #8DB600;
+    box-shadow: 0 0 0 3px rgba(141, 182, 0, 0.2);
 }
 
 button {
@@ -79,13 +79,13 @@ button {
 }
 
 #searchBtn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
     color: white;
 }
 
 #searchBtn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 20px rgba(141, 182, 0, 0.4);
 }
 
 #clearBtn {
