@@ -52,7 +52,7 @@ function calculateSimilarity(str1, str2) {
 }
 
 // 模糊搜尋主函數
-function fuzzySearch(query, errorCodes, topN = 3) {
+function fuzzySearch(query, errorCodes, topN = 5) {
     if (!query || !errorCodes || errorCodes.length === 0) {
         return [];
     }
@@ -73,7 +73,8 @@ function fuzzySearch(query, errorCodes, topN = 3) {
         // 取最高分
         const maxSimilarity = Math.max(codeSimilarity, descSimilarity, catSimilarity);
 
-        if (maxSimilarity > 0.3) { // 閾值 30%
+        // 只保留 >50% 相似度的結果
+        if (maxSimilarity > 0.5) {
             results.push({
                 ...item,
                 similarity: maxSimilarity,
