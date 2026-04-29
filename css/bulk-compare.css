@@ -205,77 +205,95 @@
 
 /* 模糊匹配建议项 */
 .fuzzy-suggestions {
-    margin-top: 10px;
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
 }
 
 .fuzzy-suggestions > p {
-    color: #6c757d;
-    margin-bottom: 15px;
+    color: #495057;
+    margin-bottom: 20px;
     font-weight: 600;
+    font-size: 1.1em;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dee2e6;
 }
 
 .fuzzy-match-item {
-    background: #fff3cd;
-    border: 2px solid #ffc107;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 12px;
+    background: white;
+    border-left: 4px solid #ffc107;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
 }
 
 .fuzzy-match-item:hover {
     transform: translateX(5px);
-    box-shadow: 0 3px 10px rgba(255, 193, 7, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.fuzzy-match-item:last-child {
+    margin-bottom: 0;
 }
 
 .match-row {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
 }
 
 .match-number {
-    background: #8DB600;
+    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
     color: white;
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 0.95em;
+    font-size: 1.1em;
+    box-shadow: 0 2px 5px rgba(141, 182, 0, 0.3);
 }
 
 .match-code {
     font-family: 'Courier New', monospace;
-    font-size: 1.3em;
+    font-size: 1.4em;
     font-weight: bold;
     color: #8DB600;
+    min-width: 100px;
 }
 
 .match-similarity {
-    background: #ffc107;
+    background: linear-gradient(135deg, #ffc107 0%, #ffdb4d 100%);
     color: #333;
-    padding: 5px 15px;
+    padding: 6px 18px;
     border-radius: 20px;
     font-weight: bold;
-    font-size: 0.9em;
+    font-size: 0.95em;
+    box-shadow: 0 2px 5px rgba(255, 193, 7, 0.3);
 }
 
 .match-description {
     color: #333;
-    font-size: 1em;
-    margin: 8px 0;
-    padding-left: 50px;
+    font-size: 1.1em;
+    margin: 12px 0 8px 55px;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #8DB600;
 }
 
 .match-category {
     color: #6c757d;
-    font-size: 0.85em;
-    padding-left: 50px;
+    font-size: 0.9em;
+    margin-left: 55px;
+    padding: 5px 0;
 }
 
 /* Not Found List */
