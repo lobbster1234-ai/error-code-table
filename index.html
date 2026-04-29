@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error Code Table 比對系統</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/enhanced-styles.css">
 </head>
 <body>
     <div class="container">
@@ -15,23 +16,9 @@
 
         <div class="search-section">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="輸入錯誤代碼 (如：NT001) 或關鍵字搜尋..." autocomplete="off">
-                <button id="searchBtn">搜尋</button>
-                <button id="clearBtn">清除</button>
+                <input type="text" id="searchInput" placeholder="輸入錯誤代碼或描述進行搜尋..." autocomplete="off">
             </div>
-            
-            <div class="filter-section">
-                <label for="categoryFilter">類別篩選：</label>
-                <select id="categoryFilter">
-                    <option value="all">全部類別</option>
-                </select>
-                
-                <label for="sortBy">排序方式：</label>
-                <select id="sortBy">
-                    <option value="code">代碼 (A-Z)</option>
-                    <option value="description">描述 (A-Z)</option>
-                </select>
-            </div>
+            <div id="searchResults"></div>
         </div>
 
         <div class="stats-section">
@@ -118,6 +105,7 @@
         </footer>
     </div>
 
+    <script src="js/fuzzy-search.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
