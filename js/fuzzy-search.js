@@ -70,8 +70,18 @@ function fuzzySearch(query, errorCodes, topN = 5) {
         const descSimilarity = calculateSimilarity(queryLower, description);
         const catSimilarity = calculateSimilarity(queryLower, category);
 
-        // 取最高分
-        const maxSimilarity = Math.max(codeSimilarity, descSimilarity, catSimilarity);
+        // 取最高分并确定匹配类型
+        let maxSimilarity = codeSimilarity;
+        let matchType = 'code';
+        
+        if (descSimilarity > maxSimilarity) {
+            maxSimilarity = descSimilarity;
+            matchType = 'description';
+        }
+        if (catSimilarity > maxSimilarity) {
+            maxSimilarity = catSimilarity;
+            matchType = 'category';
+        }
 
         // 只保留 >50% 相似度的結果
         if (maxSimilarity > 0.5) {
