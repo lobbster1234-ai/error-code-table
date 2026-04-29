@@ -1,0 +1,10 @@
+# 忽略不需要上傳的文件
+*.log
+.DS_Store
+.idea/
+.vscode/
+node_modules/
+__pycache__/
+*.pyc
+.cache/
+*.tmp

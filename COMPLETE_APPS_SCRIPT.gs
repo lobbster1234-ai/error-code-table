@@ -1,0 +1,1771 @@
+/**
+ * Error Code Table API - Google Apps Script
+ * 
+ * 部署步驟：
+ * 1. 創建新的 Google Sheet
+ * 2. 擴展功能 > Apps Script
+ * 3. 貼上此代碼
+ * 4. 點擊「部署」>「新建部署」
+ * 5. 選擇「Web 應用」
+ * 6. 執行身分：我
+ * 7. 誰有權存取：任何人
+ * 8. 複製 Web 應用網址
+ * 
+ * API 端點：
+ * GET /exec?action=getAll - 獲取所有錯誤代碼
+ * GET /exec?action=getByCode&code=NT001 - 根據代碼查詢
+ * GET /exec?action=search&q=keyword - 關鍵字搜尋
+ * GET /exec?action=getCategories - 獲取所有類別
+ */
+
+// Google Sheet ID（部署後會自動使用綁定的表格）
+const SHEET_ID = SpreadsheetApp.getActiveSpreadsheet().getId();
+
+function doGet(e) {
+  const action = e.parameter.action;
+  
+  try {
+    switch(action) {
+      case 'getAll':
+        return getAllErrorCodes();
+      case 'getByCode':
+        return getByCode(e.parameter.code);
+      case 'search':
+        return searchErrorCodes(e.parameter.q);
+      case 'getCategories':
+        return getCategories();
+      case 'getStats':
+        return getStats();
+      default:
+        return jsonResponse({ error: 'Unknown action', availableActions: ['getAll', 'getByCode', 'search', 'getCategories', 'getStats'] });
+    }
+  } catch (error) {
+    return jsonResponse({ error: error.message }, 500);
+  }
+}
+
+function doPost(e) {
+  const action = e.parameter.action;
+  
+  try {
+    switch(action) {
+      case 'add':
+        return addErrorCode(e.parameter);
+      case 'update':
+        return updateErrorCode(e.parameter);
+      case 'delete':
+        return deleteErrorCode(e.parameter.code);
+      case 'batchImport':
+        return batchImport(e.postData.contents);
+      default:
+        return jsonResponse({ error: 'Unknown action' }, 400);
+    }
+  } catch (error) {
+    return jsonResponse({ error: error.message }, 500);
+  }
+}
+
+/**
+ * 獲取所有錯誤代碼
+ */
+function getAllErrorCodes() {
+  const sheet = getSheet('ErrorCodes');
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  
+  const errorCodes = data.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((header, index) => {
+      obj[header] = row[index];
+    });
+    return obj;
+  });
+  
+  return jsonResponse({
+    success: true,
+    count: errorCodes.length,
+    data: errorCodes
+  });
+}
+
+/**
+ * 根據代碼查詢
+ */
+function getByCode(code) {
+  if (!code) {
+    return jsonResponse({ error: 'Code parameter required' }, 400);
+  }
+  
+  const sheet = getSheet('ErrorCodes');
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  
+  const result = data.slice(1).find(row => row[0] === code);
+  
+  if (!result) {
+    return jsonResponse({ error: 'Code not found', code: code }, 404);
+  }
+  
+  const obj = {};
+  headers.forEach((header, index) => {
+    obj[header] = result[index];
+  });
+  
+  return jsonResponse({
+    success: true,
+    data: obj
+  });
+}
+
+/**
+ * 關鍵字搜尋
+ */
+function searchErrorCodes(query) {
+  if (!query) {
+    return jsonResponse({ error: 'Query parameter required' }, 400);
+  }
+  
+  const sheet = getSheet('ErrorCodes');
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const searchLower = query.toLowerCase();
+  
+  const results = data.slice(1).filter(row => {
+    return row.some(cell => 
+      String(cell).toLowerCase().includes(searchLower)
+    );
+  });
+  
+  const errorCodes = results.map(row => {
+    const obj = {};
+    headers.forEach((header, index) => {
+      obj[header] = row[index];
+    });
+    return obj;
+  });
+  
+  return jsonResponse({
+    success: true,
+    count: errorCodes.length,
+    query: query,
+    data: errorCodes
+  });
+}
+
+/**
+ * 獲取所有類別
+ */
+function getCategories() {
+  const sheet = getSheet('Categories');
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  
+  const categories = data.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((header, index) => {
+      obj[header] = row[index];
+    });
+    return obj;
+  });
+  
+  return jsonResponse({
+    success: true,
+    count: categories.length,
+    data: categories
+  });
+}
+
+/**
+ * 獲取統計數據
+ */
+function getStats() {
+  const errorSheet = getSheet('ErrorCodes');
+  const categorySheet = getSheet('Categories');
+  
+  const errorCount = errorSheet.getLastRow() - 1;
+  const categoryCount = categorySheet.getLastRow() - 1;
+  
+  // 各類別統計
+  const errorData = errorSheet.getDataRange().getValues();
+  const categoryStats = {};
+  
+  errorData.slice(1).forEach(row => {
+    const category = row[2] || 'Unknown';
+    categoryStats[category] = (categoryStats[category] || 0) + 1;
+  });
+  
+  return jsonResponse({
+    success: true,
+    stats: {
+      totalErrorCodes: errorCount,
+      totalCategories: categoryCount,
+      byCategory: categoryStats
+    }
+  });
+}
+
+/**
+ * 新增錯誤代碼
+ */
+function addErrorCode(params) {
+  const sheet = getSheet('ErrorCodes');
+  const newRow = [
+    params.code,
+    params.description,
+    params.category,
+    new Date()
+  ];
+  
+  sheet.appendRow(newRow);
+  
+  return jsonResponse({
+    success: true,
+    message: 'Error code added successfully',
+    data: { code: params.code }
+  });
+}
+
+/**
+ * 更新錯誤代碼
+ */
+function updateErrorCode(params) {
+  const sheet = getSheet('ErrorCodes');
+  const data = sheet.getDataRange().getValues();
+  
+  const rowIndex = data.slice(1).findIndex(row => row[0] === params.code) + 1;
+  
+  if (rowIndex === 0) {
+    return jsonResponse({ error: 'Code not found', code: params.code }, 404);
+  }
+  
+  if (params.description) {
+    sheet.getRange(rowIndex + 1, 2).setValue(params.description);
+  }
+  if (params.category) {
+    sheet.getRange(rowIndex + 1, 3).setValue(params.category);
+  }
+  
+  return jsonResponse({
+    success: true,
+    message: 'Error code updated successfully',
+    data: { code: params.code }
+  });
+}
+
+/**
+ * 刪除錯誤代碼
+ */
+function deleteErrorCode(code) {
+  const sheet = getSheet('ErrorCodes');
+  const data = sheet.getDataRange().getValues();
+  
+  const rowIndex = data.slice(1).findIndex(row => row[0] === code) + 1;
+  
+  if (rowIndex === 0) {
+    return jsonResponse({ error: 'Code not found', code: code }, 404);
+  }
+  
+  sheet.deleteRow(rowIndex + 1);
+  
+  return jsonResponse({
+    success: true,
+    message: 'Error code deleted successfully',
+    data: { code: code }
+  });
+}
+
+/**
+ * 批量匯入
+ */
+function batchImport(jsonData) {
+  const data = JSON.parse(jsonData);
+  const sheet = getSheet('ErrorCodes');
+  
+  let imported = 0;
+  let updated = 0;
+  
+  data.forEach(item => {
+    const existingIndex = sheet.getDataRange().getValues()
+      .slice(1)
+      .findIndex(row => row[0] === item.code);
+    
+    if (existingIndex >= 0) {
+      // 更新
+      sheet.getRange(existingIndex + 2, 2).setValue(item.description);
+      sheet.getRange(existingIndex + 2, 3).setValue(item.category);
+      updated++;
+    } else {
+      // 新增
+      sheet.appendRow([item.code, item.description, item.category, new Date()]);
+      imported++;
+    }
+  });
+  
+  return jsonResponse({
+    success: true,
+    message: `Imported: ${imported}, Updated: ${updated}`,
+    stats: { imported, updated }
+  });
+}
+
+/**
+ * 初始化表格（首次使用時執行）
+ */
+function initializeSheets() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // 創建錯誤代碼表
+  let errorSheet = ss.getSheetByName('ErrorCodes');
+  if (!errorSheet) {
+    errorSheet = ss.insertSheet('ErrorCodes');
+    errorSheet.appendRow(['Code', 'Description', 'Category', 'CreatedAt']);
+  }
+  
+  // 創建類別表
+  let categorySheet = ss.getSheetByName('Categories');
+  if (!categorySheet) {
+    categorySheet = ss.insertSheet('Categories');
+    categorySheet.appendRow(['Code', 'Name', 'Description']);
+  }
+  
+  // 填入預設類別
+  const categories = [
+    ['NT', 'RF Test Function Issue', '無線電頻率測試相關錯誤'],
+    ['NE', 'EEPROM Issue', 'EEPROM 讀寫錯誤'],
+    ['NC', 'Check Value in EEPROM Issue', 'EEPROM 數值驗證錯誤'],
+    ['NI', 'Instrument Issue', '儀器設備相關錯誤'],
+    ['NF', 'E-FUSE Issue', 'E-FUSE 熔絲相關錯誤'],
+    ['ND', 'DECT Test Function Issue', 'DECT 無線電話測試錯誤'],
+    ['BT', 'Bluetooth Test Function Issue', '藍牙測試相關錯誤'],
+    ['AL', 'ADSL Test Function Issue', 'ADSL 測試相關錯誤'],
+    ['VL', 'VDSL Test Function Issue', 'VDSL 測試相關錯誤'],
+    ['GT', 'GFAST Test Function Issue', 'GFAST 測試相關錯誤'],
+    ['XL', 'xDSL Test Function Issue', 'xDSL 系列測試錯誤'],
+    ['VP', 'VOIP Test Function Issue', 'VOIP 語音測試錯誤'],
+    ['IS', 'ISDN Test Function Issue', 'ISDN 測試相關錯誤'],
+    ['HM', 'Home Media Box Test Function Issue', '家庭媒體盒測試錯誤'],
+    ['PT', 'Photo Test Function Issue', '相機測試相關錯誤'],
+    ['PN', 'PON Test Function Issue', 'PON 光纖測試錯誤'],
+    ['PL', 'Power Line Test Function Issue', '電力線測試錯誤'],
+    ['FM', 'Femtocell Test Function Issue', '小型基地台測試錯誤'],
+    ['LT', 'LTE Test Function Issue', 'LTE 測試相關錯誤'],
+    ['GF', 'General Test Function Issue', '一般測試相關錯誤'],
+    ['EN', 'Environment Issue', '環境相關錯誤'],
+    ['SF', 'SFIS Issue', 'SFIS 系統相關錯誤'],
+    ['BN', 'Burn-in Issue', '老化測試相關錯誤'],
+    ['CC', 'NFC Card Issue', 'NFC 卡測試錯誤'],
+    ['AP', 'Test Related Application Issue', '測試應用相關錯誤'],
+    ['ZB', 'Zigbee Test Function Issue', 'Zigbee 測試相關錯誤'],
+    ['AT', 'Audio Test Function Issue', '音頻測試相關錯誤'],
+    ['MC', 'MoCA Test Function Issue', 'MoCA 測試相關錯誤'],
+    ['ZW', 'Z-Wave Test Function Issue', 'Z-Wave 測試相關錯誤']
+  ];
+  
+  categories.forEach(cat => {
+    categorySheet.appendRow(cat);
+  });
+  
+  return jsonResponse({
+    success: true,
+    message: 'Sheets initialized successfully',
+    sheets: ['ErrorCodes', 'Categories']
+  });
+}
+
+/**
+ * 匯出錯誤代碼數據（用於初始匯入）
+ */
+function exportData() {
+  const sheet = getSheet('ErrorCodes');
+  const data = sheet.getDataRange().getValues();
+  
+  const errorCodes = data.slice(1).map(row => ({
+    code: row[0],
+    description: row[1],
+    category: row[2]
+  }));
+  
+  return jsonResponse({
+    success: true,
+    count: errorCodes.length,
+    data: errorCodes
+  });
+}
+
+// ===== 輔助函數 =====
+
+function getSheet(sheetName) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(sheetName);
+  
+  if (!sheet) {
+    throw new Error(`Sheet "${sheetName}" not found. Please run initializeSheets() first.`);
+  }
+  
+  return sheet;
+}
+
+function jsonResponse(data, statusCode = 200) {
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+/**
+ * 批量匯入錯誤代碼數據
+ * 執行此函數將所有 1217 筆錯誤代碼匯入 Google Sheet
+ */
+function importErrorCodes() {
+  const errorCodes = [
+    {code: 'NT001', description: 'Can\'t Open Adapter', category: 'RF Test Function Issue'},
+    {code: 'NT002', description: 'Configure File Initial Fail', category: 'RF Test Function Issue'},
+    {code: 'NT003', description: 'Crystal Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT004', description: 'Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT005', description: '11A Power Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT006', description: '11B Power Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT007', description: '11G Power Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT008', description: '5GHz Power Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT009', description: '2.4GHz Power Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT010', description: '11A TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT011', description: '11B TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT012', description: '11G TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT013', description: '5GHz 11N 20MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT014', description: '5GHz 11N 40MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT015', description: '2.4GHz 11N 20MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT016', description: '2.4GHz 11N 40MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT017', description: '11A TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT018', description: '11B TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT019', description: '11G TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT020', description: '5GHz 11N 20MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT021', description: '5GHz 11N 40MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT022', description: '2.4GHz 11N 20MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT023', description: '2.4GHz 11N 40MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT024', description: '11A Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT025', description: '11B Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT026', description: '11G Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT027', description: '5GHz 11N 20MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT028', description: '5GHz 11N 40MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT029', description: '2.4GHz 11N 20MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT030', description: '2.4GHz 11N 40MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT031', description: '11A TX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT032', description: '11B TX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT033', description: '11G TX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT034', description: '5GHz 11N 20MHz TX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT035', description: '5GHz 11N 40MHz TX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT036', description: '2.4GHz 11N 20MHz TX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT037', description: '2.4GHz 11N 40MHz TX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT038', description: '11A RX FER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT039', description: '11B RX FER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT040', description: '11G RX FER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT041', description: '5GHz 11N 20MHz RX FER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT042', description: '5GHz 11N 40MHz RX FER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT043', description: '2.4GHz 11N 20MHz RX FER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT044', description: '2.4GHz 11N 40MHz RX FER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT045', description: '11A RX RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT046', description: '11B RX RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT047', description: '11G RX RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT048', description: '5GHz 11N 20MHz RX RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT049', description: '5GHz 11N 40MHz RX RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT050', description: '2.4GHz 11N 20MHz RX RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT051', description: '2.4GHz 11N 40MHz RX RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT052', description: 'Start TX Carrier Fail', category: 'RF Test Function Issue'},
+    {code: 'NT053', description: 'Start TX Continue Fail', category: 'RF Test Function Issue'},
+    {code: 'NT054', description: 'Start TX Frames Fail', category: 'RF Test Function Issue'},
+    {code: 'NT055', description: 'Start RX Fail', category: 'RF Test Function Issue'},
+    {code: 'NT056', description: '2.4GHz TX Throughput Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT057', description: '2.4GHz RX Throughput Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT058', description: 'Command Line Fail', category: 'RF Test Function Issue'},
+    {code: 'NT059', description: 'Client Is Terminated By User', category: 'RF Test Function Issue'},
+    {code: 'NT060', description: 'Server Is Terminated By User', category: 'RF Test Function Issue'},
+    {code: 'NT061', description: 'RX Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT062', description: 'RX FER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT063', description: 'RX RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT064', description: '5GHz TX Throughput Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT065', description: '5GHz RX Throughput Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT066', description: '2.4GHz Crystal Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT067', description: '5GHz Crystal Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT068', description: 'Set PA Parameter Fail', category: 'RF Test Function Issue'},
+    {code: 'NT069', description: '5GHz 11AC 80MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT070', description: '5GHz 11AC 80MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT071', description: '5GHz 11AC 80MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT072', description: '5GHz 11AC 80MHz TX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT073', description: '5GHz 11AC 80MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT074', description: '11B Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT075', description: '11G Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT076', description: '11A Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT077', description: '2.4GHz 11N 20MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT078', description: '2.4GHz 11N 40MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT079', description: '5GHz 11N 20MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT080', description: '5GHz 11N 40MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT081', description: '5GHz 11AC 80MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT082', description: '2.4GHz 11AC 40MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT083', description: '2.4GHz 11AC 40MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT084', description: '2.4GHz 11AC 40MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT085', description: '2.4GHz 11AC 40MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT086', description: '2.4GHz 11AC 40MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT087', description: '2.4GHz 11AC 40MHz TX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT088', description: '2.4GHz DC Leakage Fail', category: 'RF Test Function Issue'},
+    {code: 'NT089', description: '5GHz DC Leakage Fail', category: 'RF Test Function Issue'},
+    {code: 'NT090', description: '5G Power Capture Fail', category: 'RF Test Function Issue'},
+    {code: 'NT091', description: '2.4G Power Capture Fail', category: 'RF Test Function Issue'},
+    {code: 'NT092', description: '11B Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT093', description: '11G Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT094', description: '11A Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT095', description: '2.4GHz 11N 20MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT096', description: '2.4GHz 11N 40MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT097', description: '5GHz 11N 20MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT098', description: '5GHz 11N 40MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT099', description: '5GHz 11AC 80MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT100', description: '5GHz 11AC 20MHz Implicit Beamforming Calibration Fail', category: 'Unknown'},
+    {code: 'NT101', description: '5GHz 11AC 20MHz Implicit Beamforming Verify Fail', category: 'Unknown'},
+    {code: 'NT102', description: '2.4GHz 11AC 20MHz TX Power Verify Fail', category: 'Unknown'},
+    {code: 'NT103', description: '2.4GHz 11AC 20MHz TX EVM Test Fail', category: 'Unknown'},
+    {code: 'NT104', description: '2.4GHz 11AC 20MHz Frequency Accuracy Fail', category: 'Unknown'},
+    {code: 'NT105', description: '2.4GHz 11AC 20MHz Spectral Mask Test Fail', category: 'Unknown'},
+    {code: 'NT106', description: '2.4GHz 11AC 20MHz RX PER Test Fail', category: 'Unknown'},
+    {code: 'NT107', description: '2.4GHz 11AC 20MHz TX PER Test Fail', category: 'Unknown'},
+    {code: 'NT108', description: '5GHz 11AC 80MHz RX Gain Test Fail', category: 'Unknown'},
+    {code: 'NT109', description: '2.4GHz RX RSSI Test Fail', category: 'Unknown'},
+    {code: 'NT110', description: '5GHz RX RSSI Test Fail', category: 'Unknown'},
+    {code: 'NT111', description: '2.4GHz Implicit Beamforming Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT112', description: '2.4GHz RX Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT113', description: '5GHz RX Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT114', description: '5GHz 11AC 40MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT115', description: '5GHz 11AC 40MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT116', description: '5GHz 11AC 40MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT117', description: '5GHz 11AC 40MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT118', description: '5GHz 11AC 20MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT119', description: '5GHz 11AC 20MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT120', description: '5GHz 11AC 20MHz Frequency Accuracy Fail', category: 'Unknown'},
+    {code: 'NT121', description: '5GHz 11AC 20MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT122', description: 'Check PA Parameter Fail', category: 'RF Test Function Issue'},
+    {code: 'NT123', description: '5GHz 11AC 20MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT124', description: '5GHz Implicit Beamforming Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT125', description: '5GHz 11AC 40MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT126', description: '2.4GHz 11AC 80MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT127', description: '2.4GHz 11AC 80MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT128', description: '2.4GHz 11AC 80MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT129', description: '2.4GHz 11AC 80MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT130', description: '2.4GHz 11AC 80MHz RX PER Test Fail', category: 'Unknown'},
+    {code: 'NT131', description: '2.4GHz Implicit Beamforming Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT132', description: '5GHz Implicit Beamforming Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT133', description: 'Send Command to DUT Fail', category: 'RF Test Function Issue'},
+    {code: 'NT134', description: '5.8G PER Power Fail', category: 'RF Test Function Issue'},
+    {code: 'NT135', description: '5.2G PER Power Fail', category: 'RF Test Function Issue'},
+    {code: 'NT136', description: '5.8G Sync Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT137', description: '5.2G Sync Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT138', description: '5.8G CCH Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT139', description: '5.2G CCH Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT140', description: '5.8G RF Power Fail', category: 'Unknown'},
+    {code: 'NT141', description: '5.2G RF Power Fail', category: 'RF Test Function Issue'},
+    {code: 'NT142', description: '5.8G PER(GT/DR) Fail', category: 'RF Test Function Issue'},
+    {code: 'NT143', description: '5.2G PER(GT/DR) Fail', category: 'RF Test Function Issue'},
+    {code: 'NT144', description: '5GHz 11AX 20MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT145', description: '5GHz 11AX 20MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT146', description: '5GHz 11AX 20MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT147', description: '5GHz 11AX 20MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT148', description: '5GHz 11AX 20MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT149', description: '5GHz 11AX 40MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT150', description: '5GHz 11AX 40MHz TX EVM Test Fail', category: 'Unknown'},
+    {code: 'NT151', description: '5GHz 11AX 40MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT152', description: '5GHz 11AX 40MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT153', description: '5GHz 11AX 40MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT154', description: '5GHz 11AX 80MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT155', description: '5GHz 11AX 80MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT156', description: '5GHz 11AX 80MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT157', description: '5GHz 11AX 80MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT158', description: '5GHz 11AX 80MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT159', description: '5GHz 11AX 160MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT160', description: '5GHz 11AX 160MHz TX EVM Test Fail', category: 'Unknown'},
+    {code: 'NT161', description: '5GHz 11AX 160MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT162', description: '5GHz 11AX 160MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT163', description: '5GHz 11AX 160MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT164', description: '2.4GHz 11AX 20MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT165', description: '2.4GHz 11AX 20MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT166', description: '2.4GHz 11AX 20MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT167', description: '2.4GHz 11AX 20MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT168', description: '2.4GHz 11AX 20MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT169', description: '2.4GHz 11AX 40MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT170', description: '2.4GHz 11AX 40MHz TX EVM Test Fail', category: 'Unknown'},
+    {code: 'NT171', description: '2.4GHz 11AX 40MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT172', description: '2.4GHz 11AX 40MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT173', description: '2.4GHz 11AX 40MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT174', description: 'TX DPD Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT175', description: 'RXSELFTEST Fail', category: 'RF Test Function Issue'},
+    {code: 'NT176', description: 'TX RX PRE CAL Fail', category: 'RF Test Function Issue'},
+    {code: 'NT177', description: 'Run DUT Command Fail', category: 'RF Test Function Issue'},
+    {code: 'NT178', description: 'ZWDFS Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT179', description: '6GHz Power Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT180', description: '6GHz Implicit Beamforming Calibration Fail', category: 'Unknown'},
+    {code: 'NT181', description: '6GHz Implicit Beamforming Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT182', description: '6GHz RX Calibration Fail', category: 'RF Test Function Issue'},
+    {code: 'NT183', description: '6GHz 11AX 20MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT184', description: '6GHz 11AX 20MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT185', description: '6GHz 11AX 20MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT186', description: '6GHz 11AX 20MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT187', description: '6GHz 11AX 20MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT188', description: '6GHz 11AX 20MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT189', description: '6GHz 11AX 40MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT190', description: '6GHz 11AX 40MHz TX EVM Test Fail', category: 'Unknown'},
+    {code: 'NT191', description: '6GHz 11AX 40MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT192', description: '6GHz 11AX 40MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT193', description: '6GHz 11AX 40MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT194', description: '6GHz 11AX 40MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT195', description: '6GHz 11AX 80MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT196', description: '6GHz 11AX 80MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT197', description: '6GHz 11AX 80MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT198', description: '6GHz 11AX 80MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT199', description: '6GHz 11AX 80MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT200', description: '6GHz 11AX 80MHz RX PER Test Fail', category: 'Unknown'},
+    {code: 'NT201', description: '6GHz 11AX 160MHz TX Power Verify Fail', category: 'Unknown'},
+    {code: 'NT202', description: '6GHz 11AX 160MHz TX EVM Test Fail', category: 'Unknown'},
+    {code: 'NT203', description: '6GHz 11AX 160MHz Frequency Accuracy Fail', category: 'Unknown'},
+    {code: 'NT204', description: '6GHz 11AX 160MHz Symbol Clock Error Fail', category: 'Unknown'},
+    {code: 'NT205', description: '6GHz 11AX 160MHz Spectral Mask Test Fail', category: 'Unknown'},
+    {code: 'NT206', description: '6GHz 11AX 160MHz RX PER Test Fail', category: 'Unknown'},
+    {code: 'NT207', description: '6GHz TX Throughput Test Fail', category: 'Unknown'},
+    {code: 'NT208', description: '6GHz RX Throughput Test Fail', category: 'Unknown'},
+    {code: 'NT209', description: '6GHz RX RSSI Test Fail', category: 'Unknown'},
+    {code: 'NT210', description: 'AVS Vcore Test Fail', category: 'Unknown'},
+    {code: 'NT211', description: '2.4GHz Ant1 RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT212', description: '2.4GHz Ant2 RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT213', description: '2.4GHz Ant3 RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT214', description: '2.4GHz Ant4 RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT215', description: '5GHz Ant1 RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT216', description: '5GHz Ant2 RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT217', description: '5GHz Ant3 RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT218', description: '5GHz Ant4 RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT219', description: '6GHz Ant1 RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT220', description: '6GHz Ant2 RSSI Test Fail', category: 'Unknown'},
+    {code: 'NT221', description: '6GHz Ant3 RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT222', description: '6GHz Ant4 RSSI Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT223', description: '6GHz 11BE 20MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT224', description: '6GHz 11BE 20MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT225', description: '6GHz 11BE 20MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT226', description: '6GHz 11BE 20MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT227', description: '6GHz 11BE 20MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT228', description: '6GHz 11BE 20MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT229', description: '6GHz 11BE 40MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT230', description: '6GHz 11BE 40MHz TX EVM Test Fail', category: 'Unknown'},
+    {code: 'NT231', description: '6GHz 11BE 40MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT232', description: '6GHz 11BE 40MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT233', description: '6GHz 11BE 40MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT234', description: '6GHz 11BE 40MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT235', description: '6GHz 11BE 80MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT236', description: '6GHz 11BE 80MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT237', description: '6GHz 11BE 80MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT238', description: '6GHz 11BE 80MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT239', description: '6GHz 11BE 80MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT240', description: '6GHz 11BE 80MHz RX PER Test Fail', category: 'Unknown'},
+    {code: 'NT241', description: '6GHz 11BE 160MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT242', description: '6GHz 11BE 160MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT243', description: '6GHz 11BE 160MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT244', description: '6GHz 11BE 160MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT245', description: '6GHz 11BE 160MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT246', description: '6GHz 11BE 160MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT247', description: '6GHz 11BE 320MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT248', description: '6GHz 11BE 320MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT249', description: '6GHz 11BE 320MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT250', description: '6GHz 11BE 320MHz Symbol Clock Error Fail', category: 'Unknown'},
+    {code: 'NT251', description: '6GHz 11BE 320MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT252', description: '6GHz 11BE 320MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT253', description: '2.4GHz 11BE 20MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT254', description: '2.4GHz 11BE 20MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT255', description: '2.4GHz 11BE 20MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT256', description: '2.4GHz 11BE 20MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT257', description: '2.4GHz 11BE 20MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT258', description: '2.4GHz 11BE 20MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT259', description: '2.4GHz 11BE 40MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT260', description: '2.4GHz 11BE 40MHz TX EVM Test Fail', category: 'Unknown'},
+    {code: 'NT261', description: '2.4GHz 11BE 40MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT262', description: '2.4GHz 11BE 40MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT263', description: '2.4GHz 11BE 40MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT264', description: '2.4GHz 11BE 40MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT265', description: '5GHz 11BE 20MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT266', description: '5GHz 11BE 20MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT267', description: '5GHz 11BE 20MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT268', description: '5GHz 11BE 20MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT269', description: '5GHz 11BE 20MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT270', description: '5GHz 11BE 20MHz RX PER Test Fail', category: 'Unknown'},
+    {code: 'NT271', description: '5GHz 11BE 40MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT272', description: '5GHz 11BE 40MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT273', description: '5GHz 11BE 40MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT274', description: '5GHz 11BE 40MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT275', description: '5GHz 11BE 40MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT276', description: '5GHz 11BE 40MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT277', description: '5GHz 11BE 80MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT278', description: '5GHz 11BE 80MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT279', description: '5GHz 11BE 80MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT280', description: '5GHz 11BE 80MHz Symbol Clock Error Fail', category: 'Unknown'},
+    {code: 'NT281', description: '5GHz 11BE 80MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT282', description: '5GHz 11BE 80MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT283', description: '5GHz 11BE 160MHz TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT284', description: '5GHz 11BE 160MHz TX EVM Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT285', description: '5GHz 11BE 160MHz Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NT286', description: '5GHz 11BE 160MHz Symbol Clock Error Fail', category: 'RF Test Function Issue'},
+    {code: 'NT287', description: '5GHz 11BE 160MHz Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT288', description: '5GHz 11BE 160MHz RX PER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT289', description: '6GHz 11A TX Power Verify Fail', category: 'RF Test Function Issue'},
+    {code: 'NT290', description: '6GHz 11A TX EVM Test Fail', category: 'Unknown'},
+    {code: 'NT291', description: '6GHz 11A Spectral Mask Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT292', description: '6GHz 11A RX FER Test Fail', category: 'RF Test Function Issue'},
+    {code: 'NT293', description: '6GHz 11A Frequency Accuracy Fail', category: 'RF Test Function Issue'},
+    {code: 'NE001', description: 'Program EEPROM Fail', category: 'EEPROM Issue'},
+    {code: 'NE002', description: 'Get Value From EEPROM Fail', category: 'EEPROM Issue'},
+    {code: 'NC001', description: 'Check MAC Address Fail', category: 'Check Value in EEPROM Issue'},
+    {code: 'NC002', description: 'Check PNPID Fail', category: 'Check Value in EEPROM Issue'},
+    {code: 'NC003', description: 'Check Country Code Fail', category: 'Check Value in EEPROM Issue'},
+    {code: 'NC004', description: 'Check RF Type Fail', category: 'Check Value in EEPROM Issue'},
+    {code: 'NI001', description: '', category: 'Instrument Issue'},
+    {code: 'NI002', description: '', category: 'Instrument Issue'},
+    {code: 'NI003', description: '', category: 'Instrument Issue'},
+    {code: 'NI004', description: '', category: 'Instrument Issue'},
+    {code: 'NI005', description: '', category: 'Instrument Issue'},
+    {code: 'NI006', description: '', category: 'Instrument Issue'},
+    {code: 'NI007', description: '', category: 'Instrument Issue'},
+    {code: 'NI008', description: '', category: 'Instrument Issue'},
+    {code: 'NI009', description: '', category: 'Instrument Issue'},
+    {code: 'NI010', description: '', category: 'Instrument Issue'},
+    {code: 'NI011', description: '', category: 'Instrument Issue'},
+    {code: 'NI012', description: '', category: 'Instrument Issue'},
+    {code: 'NI013', description: '', category: 'Instrument Issue'},
+    {code: 'NI014', description: '', category: 'Instrument Issue'},
+    {code: 'NI015', description: '', category: 'Instrument Issue'},
+    {code: 'NF001', description: 'E-FUSE Had Been Programmed', category: 'E-FUSE Issue'},
+    {code: 'NF002', description: 'Get Value From Map File Fail', category: 'E-FUSE Issue'},
+    {code: 'NF003', description: 'No free eFuse block', category: 'E-FUSE Issue'},
+    {code: 'NF004', description: 'E-FUSE Doesn\'t Have Enough Free Block', category: 'E-FUSE Issue'},
+    {code: 'NF005', description: 'E-FUSE Check Test Fail', category: 'E-FUSE Issue'},
+    {code: 'ND001', description: 'Sync Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND002', description: 'NTP Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND003', description: 'Mask Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND004', description: 'B-Field Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND005', description: 'Frequency Offset Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND006', description: 'Frequency Drift Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND007', description: 'Time Accuracy Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND008', description: 'Jitter Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND009', description: 'BER FER Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND010', description: 'DECT Registion Button Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND011', description: 'DECT Paging Button Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND012', description: 'DECTPhone Test Fail', category: 'DECT Test Function Issue'},
+    {code: 'ND013     Set DECT PIN Fail', description: '', category: 'DECT Test Function Issue'},
+    {code: 'ND014     DECT Normal Mode Fail', description: '', category: 'DECT Test Function Issue'},
+    {code: 'ND015     DECT TBR6 Mode Fail', description: '', category: 'DECT Test Function Issue'},
+    {code: 'BT001', description: 'BT/BDR Output Power Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT002', description: 'BT/BDR Power Control Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT003', description: 'BT/BDR Modulation Characteristics Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT004', description: 'BT/BDR Initial Carrier Frequency Tolerance Test', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT005', description: 'BT/BDR Carrier Drift Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT006', description: 'BT/BDR Single Slot Sensitivity Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT007', description: 'BT/BDR Multi Slot Sensitivity Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT008', description: 'BT/BDR/EDR Maximum Input Level Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT009', description: 'BT/EDR Enter Test Mode Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT010', description: 'BT/EDR Download Firmware Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT011', description: 'BT/EDR Connect to Bluetooth adapter Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT012', description: 'BT/EDR Spectrum Mask Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT013', description: 'BT/EDR Omega Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT014', description: 'BT/EDR DEVM Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT015', description: 'BT/EDR Power Diff Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT016', description: 'BT BER Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT017', description: 'BT/EDR Output Power Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT018', description: 'BT/LE Output Power Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT019', description: 'BT/LE Modulation Characteristics Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT020', description: 'BT/LE Frequency Device Sync Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT021', description: 'BT/BDR BER Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT022', description: 'BT/EDR BER Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT023', description: 'BT/LE BER Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT024', description: 'BT/EDR Initial Carrier Frequency Tolerance Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT025', description: 'BT/EDR Relative Power Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT026', description: 'BT/EDR Carrier Stability and Modulation', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT027', description: 'BT/EDR Differential Phase Encoding Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT028', description: 'Check Bluetooth MAC Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT029', description: 'Set Bluetooth MAC Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT030', description: 'Read Bluetooth MAC Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT031', description: 'Scan BT Device Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT032', description: 'Write BT UUID Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT033', description: 'BT/BDR Frequency Delta Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT034', description: 'BT/LE Output Power Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT035', description: 'BT/LE Initial Carrier Frequency Tolerance Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT036', description: 'BT/LE Frequency Delta Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT037', description: 'BT/LE Radio Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT038', description: 'Check BT UUID Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT039', description: 'BT/LE Golden Telnet login Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT040', description: 'BT/LE DUT Telnet login Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT041', description: 'BT/LE Golden Read MAC Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT042', description: 'BT/LE DUT Read MAC Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT043', description: 'BT/LE Golden Check Status Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT044', description: 'BT/LE DUT Check Status Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT045', description: 'BT/LE Golden Throughput Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT046', description: 'BT/LE DUT Throughput Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT047', description: 'BT/LE Golden RSSI Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT048', description: 'BT/LE Dut RSSI Test Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT049', description: 'BT/LE xtal calibration fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT050', description: 'BT/LE Frequency Delta ratio test fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT051', description: 'BT/LE Rx PER fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT052', description: 'Burn BLE NCP FW Fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT053', description: 'Write BT crystal fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'BT054', description: 'BT test parameter fail', category: 'Bluetooth Test Function Issue'},
+    {code: 'AL001', description: 'Get ADSL Channel Rate Fail', category: 'ADSL Test Function Issue'},
+    {code: 'AL002', description: 'Check ADSL Channel Rate Fail', category: 'ADSL Test Function Issue'},
+    {code: 'AL003', description: 'Get ADSL CRC Error Fail', category: 'ADSL Test Function Issue'},
+    {code: 'AL004', description: 'Check ADSL CRC Error Fail', category: 'ADSL Test Function Issue'},
+    {code: 'AL005', description: 'Get ADSL Noise Margin Fail', category: 'ADSL Test Function Issue'},
+    {code: 'AL006', description: 'Check ADSL Noise Margin Fail', category: 'ADSL Test Function Issue'},
+    {code: 'VL001', description: 'Get VDSL Channel Rate Fail', category: 'VDSL Test Function Issue'},
+    {code: 'VL002', description: 'Check VDSL Channel Rate Fail', category: 'VDSL Test Function Issue'},
+    {code: 'GT001     Get GFAST Channel Rate Fail', description: '', category: 'GFAST Test Function Issue'},
+    {code: 'GT002     Check GFAST Channel Rate Fail', description: '', category: 'GFAST Test Function Issue'},
+    {code: 'XL001', description: 'Get ADSL Annex A Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL002', description: 'Check ADSL Annex A Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL003', description: 'Get ADSL Annex B Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL004', description: 'Check ADSL Annex B Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL005', description: 'Get ADSL2 Annex A Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL006', description: 'Check ADSL2 Annex A Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL007', description: 'Get ADSL2 Annex B Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL008', description: 'Check ADSL2 Annex B Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL009', description: 'Get ADSL2+ Annex A Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL010', description: 'Check ADSL2+ Annex A Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL011', description: 'Get ADSL2+ Annex B Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL012', description: 'Check ADSL2+ Annex B Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL013', description: 'Get VDSL Annex A Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL014', description: 'Check VDSL Annex A Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL015', description: 'Get VDSL Annex B Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL016', description: 'Check VDSL Annex B Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL017', description: 'Get VDSL2 Annex A Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL018', description: 'Check VDSL2 Annex A Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL019', description: 'Get VDSL2 Annex B Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'XL020', description: 'Check VDSL2 Annex B Channel Rate Fail', category: 'xDSL Test Function Issue'},
+    {code: 'VP001', description: 'On Hook Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP002', description: 'Change Port Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP003', description: 'FXS DCV Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP004', description: 'FXS Ring Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP005', description: '1K Voice Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP006', description: 'Quiet Noise Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP007', description: 'FXS Rx DTMF Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP008', description: 'FXS Tx DTMF Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP009', description: 'FXO Ring Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP010', description: 'FXO Rx DTMF Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP011', description: 'FXO Tx DTMF Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP012', description: 'Relay Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP013', description: 'FXS1 Ring Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP014', description: 'FXS2 Ring Test Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP015', description: 'VOIP Init Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP016', description: 'Off Hook Fail', category: 'VOIP Test Function Issue'},
+    {code: 'VP017', description: 'FXS Phone Detect Fail', category: 'VOIP Test Function Issue'},
+    {code: 'IS001', description: '', category: 'ISDN Test Function Issue'},
+    {code: 'IS002', description: '', category: 'ISDN Test Function Issue'},
+    {code: 'IS003', description: '', category: 'ISDN Test Function Issue'},
+    {code: 'HM001', description: 'HDMI Video Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM002', description: 'HDMI Audio Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM003', description: 'CVBS Video Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM004', description: 'CVBS Audio Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM005', description: 'SCART CVBS Video Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM006', description: 'SCART CVBS Audio Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM007', description: 'RGB Video Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM008', description: 'RGB Audio Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM009', description: 'SVIDEO Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM010', description: 'YPbPr Video Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM011', description: 'YPbPr Audio Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM012', description: 'SPDIF COAXIAL Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM013', description: 'SPDIF OPTICAL Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM014', description: 'IR Receiver Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM015', description: '7-SEG LED Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM016', description: 'SATA Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM017', description: 'Fast Blanking Voltage Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM018', description: 'Switch Voltage Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM019', description: 'Headphone Jack Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM020', description: 'OTP Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM021', description: 'DVB-T Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM022', description: 'SD Card Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM023', description: 'HDCP Code Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM024', description: 'CEC Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM025', description: 'Compare Blob Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM026', description: 'Download Key File Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM027', description: 'Download Image Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM028', description: 'Clear Env Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM029', description: 'Check Security Image Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM030', description: 'HDMI Picture Compare Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM031', description: 'HDMI DDC Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM032', description: 'MD5 Check Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM033', description: 'HDMI ARC Picture Compare Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM034', description: 'Emmc Throughput Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM035', description: 'Set Boot Env Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM036', description: 'Set Access Finish Stage Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM037', description: 'Check Access Finish Stage Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM038', description: 'Set BT Test Mode Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM039', description: 'DRM Key Injection Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM040', description: 'Check Bolt Version Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM041', description: 'Find DRM Key Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM042', description: 'Find HDCP Key Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM043', description: 'Get DRM MD5 Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM044', description: 'Write OtpMsp Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM045', description: 'Set to Android Recovery Mode Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM046', description: 'Get AES MD5 Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM047', description: 'Get Mediaroom MD5 Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM048', description: 'Find AES Key Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM049', description: 'Find Mediaroom Key Fai', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM050', description: 'Write OtpMsp3 Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM051', description: 'Check MrIPTv Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM052', description: 'AES/Mediaroom Key Injection Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM053', description: 'Get EDAC MD5 Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM054', description: 'Check EDAC Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM055', description: 'Check Wifi MAC Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM056', description: 'Check LAN MAC Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM057', description: 'Check SN Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM058', description: 'HDMI Re-Open Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM059', description: 'Capture Log Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM060', description: 'Read Capture Log Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM061', description: 'Check CPU Type Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM062', description: 'Update to Default Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM063', description: 'Load Test Image From USB Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM064', description: 'Get VM Chip ID Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM065', description: 'Check Rework Uart Issue Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM066', description: 'Rework Uart Issue Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM067', description: 'DCB Certificate fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM068', description: 'HDD Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM069', description: 'DVB-S Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM070', description: 'Get Emmc Name Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM071', description: 'Get CPU UID Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM072', description: 'BP3 Provision Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM073', description: 'Parsing BP3 Bin and Provision Log Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM074', description: 'Check BP3 Provision Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM075', description: 'Show BP3 Key Status Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM076', description: 'Create CA Default Partition Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM077', description: 'Get CDSN Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM078', description: 'Create CA Private Data Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM079', description: 'Write CA 51 Key Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM080', description: 'Check CA Value Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM081', description: 'Generate CA Report Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM082', description: 'OTA Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM083', description: 'Get Final Version Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM084', description: 'Set Android Boot Command Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM085', description: 'Check CSSN Label Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM086', description: 'Check GPT Table Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM086', description: 'Check GPT Table Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM087', description: 'Get ACAS ID Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM088', description: 'Check ACAS ID Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM089', description: 'Check BBS Port Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM090', description: 'Get Temperature Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM091', description: 'FAN Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM092', description: 'Enable FAN Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM093', description: 'Disable FAN Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM094', description: 'Creat FAT32 Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM095', description: 'Write All Key Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM096', description: 'Get All Key Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM097', description: 'Check DRMID Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM098', description: 'DVB-C Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM099', description: 'Emmc Speed Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'HM100', description: 'Create Default WiFi Calibration File Fail', category: 'Unknown'},
+    {code: 'HM101', description: 'Test Tuner Fail', category: 'Unknown'},
+    {code: 'HM102', description: 'Check CCAS Test Fail', category: 'Unknown'},
+    {code: 'HM103', description: 'Enable Emmc Reset Fail', category: 'Unknown'},
+    {code: 'HM104', description: 'Power Down Test Fail', category: 'Unknown'},
+    {code: 'HM105', description: 'Check DRMID with SFIS Fail', category: 'Unknown'},
+    {code: 'HM106', description: 'Open Camera Fail', category: 'Unknown'},
+    {code: 'HM107', description: 'Capture Photo Fail', category: 'Unknown'},
+    {code: 'HM108', description: 'Transfer Photo Fail', category: 'Unknown'},
+    {code: 'HM109', description: 'RGB Capture Test Fail', category: 'Unknown'},
+    {code: 'HM110', description: 'Slider Test Fail', category: 'Unknown'},
+    {code: 'HM111', description: 'EDID Test Fail', category: 'Home Media Box Test Function Issue'},
+    {code: 'PT001', description: 'Photo test fail', category: 'Photo Test Function Issue'},
+    {code: 'PT002', description: 'SFR/MTF test fail', category: 'Photo Test Function Issue'},
+    {code: 'PT003', description: 'RGB color accuracy test fail', category: 'Photo Test Function Issue'},
+    {code: 'PT004', description: 'Color shading test fail', category: 'Photo Test Function Issue'},
+    {code: 'PT005', description: 'Lens shading test fail', category: 'Photo Test Function Issue'},
+    {code: 'PT006', description: 'Particle test fail', category: 'Photo Test Function Issue'},
+    {code: 'PT007', description: 'Hot pixel test fail', category: 'Photo Test Function Issue'},
+    {code: 'PT008', description: 'Bad pixel test fail', category: 'Photo Test Function Issue'},
+    {code: 'PT009', description: 'Distortion test fail', category: 'Photo Test Function Issue'},
+    {code: 'PT010', description: 'Shift test fail', category: 'Photo Test Function Issue'},
+    {code: 'PN005', description: 'Telnet_Ftp_FH Fail', category: 'PON Test Function Issue'},
+    {code: 'PN101', description: 'Check CMA50 Fail', category: 'Unknown'},
+    {code: 'PN102', description: 'Check Optical Power Fail', category: 'Unknown'},
+    {code: 'PN103', description: 'Connect to Optical Power Meter Fail', category: 'Unknown'},
+    {code: 'PN104', description: 'Optical Loss Check Fail', category: 'Unknown'},
+    {code: 'PN105', description: 'Enable Laser TX via CLI Fail', category: 'Unknown'},
+    {code: 'PN106', description: 'Disable Laser TX via CLI Fail', category: 'Unknown'},
+    {code: 'PN201', description: 'CLI_PON_RXlink_Check Fail', category: 'Unknown'},
+    {code: 'PN202', description: 'Wait PON_RX String Fail', category: 'Unknown'},
+    {code: 'PN203', description: 'Web_PON_RXlink_Check Fail', category: 'Unknown'},
+    {code: 'PN204', description: 'Write TSSI Fail', category: 'Unknown'},
+    {code: 'PN205', description: 'PON Throughput Test Fail', category: 'Unknown'},
+    {code: 'PN206', description: 'Check TSSI Fail', category: 'Unknown'},
+    {code: 'PN301', description: 'Telnet_C242_ONU Fail', category: 'Unknown'},
+    {code: 'PN500', description: 'Detect BOSA Module Cal Data File From Data', category: 'Unknown'},
+    {code: 'PN501', description: 'Set BOSA DDMI Data Fail', category: 'Unknown'},
+    {code: 'PN502', description: 'Set BOSA Target Data Fail', category: 'Unknown'},
+    {code: 'PN503', description: 'Set BOSA Laser TX PWR Fail', category: 'Unknown'},
+    {code: 'PN504', description: 'Set BOSA Laser RX PWR Fail', category: 'Unknown'},
+    {code: 'PN505', description: 'Set BOSA LU Table Fail', category: 'Unknown'},
+    {code: 'PN506', description: 'Set BOSA A0 Table Fail', category: 'Unknown'},
+    {code: 'PN507', description: 'Check BOSA DDMI Fail', category: 'Unknown'},
+    {code: 'PN508', description: 'Check BOSA Target Fail', category: 'Unknown'},
+    {code: 'PN509', description: 'Check BOSA TX PWR Fail', category: 'Unknown'},
+    {code: 'PN510', description: 'Check BOSA RX PWR Fail', category: 'Unknown'},
+    {code: 'PN511', description: 'Check BOSA LU Table Fail', category: 'PON Test Function Issue'},
+    {code: 'PN512', description: 'Check BOSA A0 Table Fail', category: 'PON Test Function Issue'},
+    {code: 'PN513', description: 'Check Test Fixture OLT Fail', category: 'PON Test Function Issue'},
+    {code: 'PN514', description: 'OLT Side Start to PRBS Mode Fail', category: 'PON Test Function Issue'},
+    {code: 'PN515', description: 'ONT Side Set PRBS Command Fail', category: 'PON Test Function Issue'},
+    {code: 'PN516', description: 'ONT Side Pre PRBS Test Fail', category: 'PON Test Function Issue'},
+    {code: 'PN517', description: 'ONT Side PRBS Test Fail', category: 'PON Test Function Issue'},
+    {code: 'PN518', description: 'BOSA Calibration TX Test Fail', category: 'PON Test Function Issue'},
+    {code: 'PN519', description: 'BOSA Eye Diagram Test Fail', category: 'PON Test Function Issue'},
+    {code: 'PN520', description: 'Check ONT connect Success from OLT Side Fail', category: 'Unknown'},
+    {code: 'PN521', description: 'Check OLT Enable Fail', category: 'PON Test Function Issue'},
+    {code: 'PN522', description: 'Check ONT Signal Level from OLT Fail', category: 'PON Test Function Issue'},
+    {code: 'PN523', description: 'ONT Check MAC Base Fail', category: 'PON Test Function Issue'},
+    {code: 'PN524', description: 'ONT Check MAC address number Fail', category: 'PON Test Function Issue'},
+    {code: 'PN525', description: 'Set to Normal Mode Fail', category: 'PON Test Function Issue'},
+    {code: 'PN528', description: 'Check Serial Number Fail', category: 'PON Test Function Issue'},
+    {code: 'PN529', description: 'BOSA Eye Diagram Test Fail', category: 'PON Test Function Issue'},
+    {code: 'PN530', description: 'BOSA Eye Diagram ER Test Fail', category: 'Unknown'},
+    {code: 'PN531', description: 'BOSA Eye Diagram P-P Jitter Test Fail', category: 'PON Test Function Issue'},
+    {code: 'PN532', description: 'BOSA Eye Diagram Mask Margin Test Fail', category: 'PON Test Function Issue'},
+    {code: 'PN533', description: 'BOSA Eye Diagram Avg Power Check Fail', category: 'PON Test Function Issue'},
+    {code: 'PN535', description: 'BOSA Eye Diagram Crossing and ER Test Fail', category: 'PON Test Function Issue'},
+    {code: 'PN536', description: 'OLT Side Set IS Fail', category: 'PON Test Function Issue'},
+    {code: 'PN537', description: 'BOSA Calibration RX Test Fail', category: 'PON Test Function Issue'},
+    {code: 'PN538', description: 'OLT Side Set OOS Fail', category: 'PON Test Function Issue'},
+    {code: 'PN539', description: 'BOSA Calibration RX Test Set Attenuator Fail', category: 'PON Test Function Issue'},
+    {code: 'PN540', description: 'BOSA Load Test Image Fail', category: 'Unknown'},
+    {code: 'PN541', description: 'Check OLT link to ONU Fail', category: 'PON Test Function Issue'},
+    {code: 'PN542', description: 'Check Ethernet Link Status Fail', category: 'PON Test Function Issue'},
+    {code: 'PN543', description: 'Can\'t execute NuServerAP.exe', category: 'PON Test Function Issue'},
+    {code: 'PN544', description: 'Check BOSA RX DDMI Too High', category: 'PON Test Function Issue'},
+    {code: 'PN545', description: 'Check BOSA RX DDMI Too Low', category: 'PON Test Function Issue'},
+    {code: 'PN546', description: 'Get BOSA RX DDMI Fail', category: 'PON Test Function Issue'},
+    {code: 'PN547', description: 'Get BOSA TX DDMI Fail', category: 'PON Test Function Issue'},
+    {code: 'PN548', description: 'Check BOSA TX Power Too High', category: 'PON Test Function Issue'},
+    {code: 'PN549', description: 'Check BOSA TX Power Too Low', category: 'PON Test Function Issue'},
+    {code: 'PN550', description: 'Set BOSA Init Power Fail', category: 'Unknown'},
+    {code: 'PN551', description: 'Set BOSA Ibias Fail', category: 'PON Test Function Issue'},
+    {code: 'PN552', description: 'Set BOSA Eye Diagram Switch Fail', category: 'PON Test Function Issue'},
+    {code: 'PN600     Initialize Calibration Process Fail', description: '', category: 'Unknown'},
+    {code: 'PN601     APD Calibration Fail', description: '', category: 'Unknown'},
+    {code: 'PN602     Open Loop Calibration Fail', description: '', category: 'Unknown'},
+    {code: 'PN603     MPD Channel Calibration Fail', description: '', category: 'Unknown'},
+    {code: 'PN604     DCD Calibration Fail', description: '', category: 'Unknown'},
+    {code: 'PN605     tracking cal tracking targets Fail', description: '', category: 'Unknown'},
+    {code: 'PN606     Average optical power calibration Fail', description: '', category: 'Unknown'},
+    {code: 'PN608     First Burst Targets Calibration Fail', description: '', category: 'Unknown'},
+    {code: 'PN609     Eye Safety Threshold Validation Fail', description: '', category: 'Unknown'},
+    {code: 'PN610     Rogue Threshold Validation Fail', description: '', category: 'Unknown'},
+    {code: 'PN611     RSSI Calibration Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN612     RSSI-LOS Calibration Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN614     Program Calibration Data Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN615     BRCM PON Solution Verify TX Power Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN616     BRCM PON Solution Verify RX Power Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN617     BRCM PON Solution Verify RX SEN Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN618     Put PMD firmware in calibration mode Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN619     Remove PMD calibration files from flash Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN621     Bias Optical Power Calibration Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN622     Modulation Optical Power Calibration Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN623     Check Calibration Data Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN624     PON throughput larger than link rate', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN625     Python Calibration Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN700     XGPON RX SEN PRBS23 Test Fail', description: '', category: 'Unknown'},
+    {code: 'PN701     XGPON Init and connect to Test Equipment Fail', description: '', category: 'Unknown'},
+    {code: 'PN702     XGPON TX Calibration Test Fail', description: '', category: 'Unknown'},
+    {code: 'PN703     XGPON RX Calibration Test Fail', description: '', category: 'Unknown'},
+    {code: 'PN704     XGPON TX Calibration Exception Fail', description: '', category: 'Unknown'},
+    {code: 'PN705     XGPON RX Calibration Exception Fail', description: '', category: 'Unknown'},
+    {code: 'PN706     XGPON Read Power Measurements From OPM Fail', description: '', category: 'Unknown'},
+    {code: 'PN707     XGPON Generate and Write APD LUT Fail', description: '', category: 'Unknown'},
+    {code: 'PN708     XGPON RX Calibration Set Attenuator Fail', description: '', category: 'Unknown'},
+    {code: 'PN709     XGPON Check TX DDMI too Hight Fail', description: '', category: 'Unknown'},
+    {code: 'PN710     XGPON Check TX DDMI too Low Fail', description: '', category: 'Unknown'},
+    {code: 'PN711     XGPON Check RX DDMI too Hight Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN712     XGPON Check RX DDMI too Low Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN713     XGPON Extinction Ratio Calibration Exception', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN714     XGPON Check DDMI Get Data Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN715     XGPON Set the EYE Diagram Measured Port Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN716     XGPON Extinction Ratio Calibration Tune ER', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN717     XGPON Extinction Ratio Calibration Check', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN718     XGPON Extinction Ratio Calibration Check', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN719     XGPON Extinction Ratio Calibration Check Point', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN720     XGPON Extinction Ratio Calibration Check Mask', description: '', category: 'Unknown'},
+    {code: 'PN721     XGPON Measuring and Check TXPOW with', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN722     XGPON Measuring and Check TXPOW with', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN723     XGPON Measuring and Check RXPOW with', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN724     XGPON Measuring and Check RXPOW with', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN725     XGPON Check TX Power Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN726     XGPON Check RX Power Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN727     XGPON Check connection Status between ONU', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN751     Init and connect to Test Equipment Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN752     Extinction Ratio Calibration Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN753     Transmit Output Power Tuning Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN754     Extinction Ratio Calibration Tune ER Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN755     Extinction Ratio Calibration Check Point to Point', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN756     Extinction Ratio Calibration Check Mask Margin', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN757     Query BOSA Data From DataBase Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN758     Estimate DAC Value Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN759     Check table 4 0x98, 0x99 Fail', description: '', category: 'Unknown'},
+    {code: 'PN760     Enable Prbs23 Fail', description: '', category: 'Unknown'},
+    {code: 'PN761     Set Support Volt=3.3V Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN762     Set TX power slop and offset Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN763     Load Calibration init data Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN764     Check Bias Current Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN765     RX SEN PRBS23 Test Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN766     Back Up Calibration Data Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN767     Check RX DDMI too Hight at -29 dBm Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN768     Check RX DDMI too Low at -29 dBm Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN769     Check RX DDMI too Hight at -25 dBm Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN770     Check RX DDMI too Low at -25 dBm Fail', description: '', category: 'Unknown'},
+    {code: 'PN771     Check RX DDMI too Hight at -15 dBm Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN772     Check RX DDMI too Low at -15 dBm Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN773     Check RX Board Data Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN774     Load Initial File Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN775     Check Link status Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN776     Check DDMI Temperature (too Low) Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN777     Check DDMI Temperature (too High) Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN778     Check BOSA Data Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN779     Check DDMI Transmit Power (too Low) Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN780     Check DDMI Transmit Power (too High) Fail', description: '', category: 'Unknown'},
+    {code: 'PN781     Check DDMI Receive Power (too Low) Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN782     Check DDMI Receive Power (too High) Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN783     Check Transmit Output Power Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN784     Extinction Ratio Calibration Check Crossing Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN785     Check Register Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PN786     Check RX DDMI RX Power Fail', description: '', category: 'PON Test Function Issue'},
+    {code: 'PL001', description: 'Zero Cross Fail', category: 'Power Line Test Function Issue'},
+    {code: 'PL002', description: 'Burn Micro Code Fail', category: 'Power Line Test Function Issue'},
+    {code: 'PL003', description: 'Check Power Saving Mode Fail', category: 'Power Line Test Function Issue'},
+    {code: 'FM001', description: 'Initial Frequency Calibration Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM002', description: 'TX Power Calibration Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM003', description: 'RX RSSI Calibration Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM004', description: 'TX Frequency Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM005', description: 'Tx Power Step Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM006', description: 'TX RHO Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM007', description: 'TX ACP Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM008', description: 'TX SEM Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM009', description: 'RX RSSI Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM010', description: 'RX BLER Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM011', description: 'RX Sensitivity Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM012', description: 'N7309A1 program init Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM013', description: 'Agilent MXA init Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM014', description: 'Agilent ESG init Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM015', description: 'RF Test Timeout', category: 'Femtocell Test Function Issue'},
+    {code: 'FM016', description: 'OTP1 MAC addr programmming Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM017', description: 'Telnet connection to DUT Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM018', description: 'Update kernal Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM019', description: 'Update rfs Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM020', description: 'Update app Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM021', description: 'Update unitdata Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM022', description: 'Update caldata Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM023', description: 'SCP connection to DUT Fail', category: 'Femtocell Test Function Issue'},
+    {code: 'FM024', description: 'Can\'t find correct unitdata', category: 'Femtocell Test Function Issue'},
+    {code: 'LT001', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT002', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT003', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT004', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT005', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT006', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT007', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT008', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT009', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT010', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT011', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT012', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT013', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT014', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT015', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT016', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT017', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT018', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT019', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT020', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT021', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT022', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT023', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT024', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT025', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT026', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT027', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT028', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT029', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT030', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT031', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT032', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT033', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT034', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT035', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT036', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT037', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT038', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT039', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT040', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT041', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT042', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT043', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT044', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT045', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT046', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT047', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT048', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT049', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT050', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT051', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT052', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT053', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT054', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT055', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT056', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT057', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT058', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT059', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT060', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT061', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT062', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT063', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT064', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT065', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT066', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT067', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT068', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT069', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT070', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT071', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT072', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT073', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT074', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT075', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT076', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT077', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT078', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT079', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT080', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT081', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT082', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT083', description: '', category: 'LTE Test Function Issue'},
+    {code: 'LT084', description: '', category: 'LTE Test Function Issue'},
+    {code: 'GF001', description: 'Set Boot Parameters Fail', category: 'General Test Function Issue'},
+    {code: 'GF002', description: 'CLI Command Fail', category: 'General Test Function Issue'},
+    {code: 'GF003', description: 'Detect Wireless Card Fail', category: 'General Test Function Issue'},
+    {code: 'GF004', description: 'Ping Fail', category: 'General Test Function Issue'},
+    {code: 'GF005', description: 'LED Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF006', description: 'Reset Button Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF007', description: 'WLAN Button Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF008', description: 'WPS Button Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF009', description: 'LAN Port Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF010', description: 'USB Host Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF011', description: 'USB Slave Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF012', description: 'DOS Command Fail', category: 'General Test Function Issue'},
+    {code: 'GF013', description: 'ART Command Fail', category: 'General Test Function Issue'},
+    {code: 'GF014', description: 'Upload Test Image Fail', category: 'General Test Function Issue'},
+    {code: 'GF015', description: 'TX Throughput Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF016', description: 'RX Throughput Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF017', description: 'Set SSID Fail', category: 'General Test Function Issue'},
+    {code: 'GF018', description: 'Set Bridge Mode Fail', category: 'General Test Function Issue'},
+    {code: 'GF019', description: 'Set PPPoE Mode Fail', category: 'General Test Function Issue'},
+    {code: 'GF020', description: 'Disable Firewall Fail', category: 'General Test Function Issue'},
+    {code: 'GF021', description: 'Set Security Fail', category: 'General Test Function Issue'},
+    {code: 'GF022', description: 'Set To ADSL Mode Fail', category: 'General Test Function Issue'},
+    {code: 'GF023', description: 'Set To VDSL Mode Fail', category: 'General Test Function Issue'},
+    {code: 'GF024', description: 'Set To ISDN Mode Fail', category: 'General Test Function Issue'},
+    {code: 'GF025', description: 'Set DUT IP Fail', category: 'General Test Function Issue'},
+    {code: 'GF026', description: 'Set Country Fail', category: 'General Test Function Issue'},
+    {code: 'GF027', description: 'Set SKU ID Fail', category: 'General Test Function Issue'},
+    {code: 'GF028', description: 'Set WPS PIN ID Fail', category: 'General Test Function Issue'},
+    {code: 'GF029', description: 'Set DUT To Default Fail', category: 'General Test Function Issue'},
+    {code: 'GF030', description: 'Check Web Value Fail', category: 'General Test Function Issue'},
+    {code: 'GF031', description: 'Check SKU ID Fail', category: 'General Test Function Issue'},
+    {code: 'GF032', description: 'Check WPS PIN ID Fail', category: 'General Test Function Issue'},
+    {code: 'GF033', description: 'Check DUT Default Fail', category: 'General Test Function Issue'},
+    {code: 'GF034', description: 'Check Runtime Version Fail', category: 'General Test Function Issue'},
+    {code: 'GF035', description: 'Check Mini-Kernel Fail', category: 'General Test Function Issue'},
+    {code: 'GF036', description: 'Upgrade Boot Code Fail', category: 'General Test Function Issue'},
+    {code: 'GF037', description: 'Upgrade Runtime Code Fail', category: 'General Test Function Issue'},
+    {code: 'GF038', description: 'Upgrade Private Key Fail', category: 'General Test Function Issue'},
+    {code: 'GF039', description: 'Upgrade Public Key Fail', category: 'General Test Function Issue'},
+    {code: 'GF040', description: 'Throughput Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF041', description: 'Set Log Fail', category: 'General Test Function Issue'},
+    {code: 'GF042', description: 'LCD Panel Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF043', description: 'Touch Pad Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF044', description: 'Board Configuration test Fail', category: 'General Test Function Issue'},
+    {code: 'GF045', description: 'Memory Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF047', description: 'Check Boot Code Version Fail', category: 'General Test Function Issue'},
+    {code: 'GF048', description: 'Set RSA Key Fail', category: 'General Test Function Issue'},
+    {code: 'GF049', description: 'Check Program Information Fail', category: 'General Test Function Issue'},
+    {code: 'GF050', description: 'Check Version det information Fail', category: 'General Test Function Issue'},
+    {code: 'GF051', description: 'Power ON and Check AP Status Fail', category: 'General Test Function Issue'},
+    {code: 'GF053', description: 'Check 2G Association test Fail', category: 'General Test Function Issue'},
+    {code: 'GF054', description: 'Check 5G Association test Fail', category: 'General Test Function Issue'},
+    {code: 'GF055', description: 'Get Sessions ID and Verify Client card IP Addr', category: 'General Test Function Issue'},
+    {code: 'GF056', description: 'Disable Radio and Get show log buffer Fail', category: 'General Test Function Issue'},
+    {code: 'GF057', description: 'DUT bootcode and Bootstrap version information', category: 'General Test Function Issue'},
+    {code: 'GF058', description: 'Check 2G Client Card Info Fail', category: 'General Test Function Issue'},
+    {code: 'GF059', description: 'Check 5G Client Card Info Fail', category: 'General Test Function Issue'},
+    {code: 'GF060', description: 'Run ART2-CART Fail', category: 'General Test Function Issue'},
+    {code: 'GF061', description: 'Wait ART2 Initialization Timeout', category: 'General Test Function Issue'},
+    {code: 'GF062', description: 'ART2 Open Report file Fail', category: 'General Test Function Issue'},
+    {code: 'GF063', description: 'ART2 2GHz Power Accuracy by chain Fail', category: 'General Test Function Issue'},
+    {code: 'GF064', description: 'ART2 2GHz Power (EVM) Accuracy Fail', category: 'General Test Function Issue'},
+    {code: 'GF065', description: 'ART2 2GHz EVM Accuracy Fail', category: 'General Test Function Issue'},
+    {code: 'GF066', description: 'ART2 2GHz Frequency Accuracy Fail', category: 'General Test Function Issue'},
+    {code: 'GF067', description: 'ART2 2GHz Spectral Mask Fail', category: 'General Test Function Issue'},
+    {code: 'GF068', description: 'ART2 2GHz Sensitivity Fail', category: 'General Test Function Issue'},
+    {code: 'GF069', description: 'ART2 Wait 2GHz Calibration Coefficients timeout', category: 'General Test Function Issue'},
+    {code: 'GF070', description: 'ART2 Wait 2GHz EVM Accuracy timeout', category: 'General Test Function Issue'},
+    {code: 'GF071', description: 'ART2 Wait 2GHz SPECTRAL MASK timeout', category: 'General Test Function Issue'},
+    {code: 'GF072', description: 'ART2 Wait 2GHz RSSI Calibration timeout', category: 'General Test Function Issue'},
+    {code: 'GF073', description: 'ART2 Wait 2GHZ SENSITIVITY timeout', category: 'General Test Function Issue'},
+    {code: 'GF074', description: 'JUNP Set Model Name Fail', category: 'General Test Function Issue'},
+    {code: 'GF075', description: 'JUNP Set Ethernet MAC Addr Fail', category: 'General Test Function Issue'},
+    {code: 'GF076', description: 'JUNP Set Serial Number Fail', category: 'General Test Function Issue'},
+    {code: 'GF077', description: 'JUNP Set RegionID Fail', category: 'General Test Function Issue'},
+    {code: 'GF078', description: 'JUNP Set Number MAC Fail', category: 'General Test Function Issue'},
+    {code: 'GF079', description: 'JUNP Set Harware Version Fail', category: 'General Test Function Issue'},
+    {code: 'GF080', description: 'ART2 Wait 5GHz Calibration Coefficients', category: 'General Test Function Issue'},
+    {code: 'GF081', description: 'ART2 5GHz Power Accuracy by chain Fail', category: 'General Test Function Issue'},
+    {code: 'GF082', description: 'ART2 5GHz Power (EVM) Accuracy Fail', category: 'General Test Function Issue'},
+    {code: 'GF083', description: 'ART2 5GHz Sensitivity Fail', category: 'General Test Function Issue'},
+    {code: 'GF084', description: 'ART2 5GHz EVM Accuracy Fail', category: 'General Test Function Issue'},
+    {code: 'GF085', description: 'ART2 5GHz Frequency Accuracy Fail', category: 'General Test Function Issue'},
+    {code: 'GF086', description: 'ART2 write calibration value Fail', category: 'General Test Function Issue'},
+    {code: 'GF087', description: 'ART2 Restore FLASH partition Fail', category: 'General Test Function Issue'},
+    {code: 'GF088', description: 'ART2 Ping to IQF IP Fail', category: 'General Test Function Issue'},
+    {code: 'GF089', description: 'ART2 Communication with IQF Fail', category: 'General Test Function Issue'},
+    {code: 'GF090', description: 'JUNP Download uBoot Fail', category: 'General Test Function Issue'},
+    {code: 'GF091', description: 'JUNP Set MFG Data Fail', category: 'General Test Function Issue'},
+    {code: 'GF092', description: 'PCI-E Component Fail', category: 'General Test Function Issue'},
+    {code: 'GF093', description: 'Device Reset Error', category: 'General Test Function Issue'},
+    {code: 'GF094', description: 'SIM Card Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF095', description: 'External Loopback Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF096', description: 'Check Relay Board Status Fail', category: 'General Test Function Issue'},
+    {code: 'GF097', description: 'Internal Loopback Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF098', description: 'Set 2G ClientCard Kill Iperf flag Fail', category: 'General Test Function Issue'},
+    {code: 'GF099', description: 'Set 5G ClientCard Kill Iperf flag Fail', category: 'General Test Function Issue'},
+    {code: 'GF100', description: 'Parsing Logfile Fail', category: 'Unknown'},
+    {code: 'GF101', description: 'LAN Port 1 Test Fail', category: 'Unknown'},
+    {code: 'GF102', description: 'LAN Port 2 Test Fail', category: 'Unknown'},
+    {code: 'GF103', description: 'LAN Port 3 Test Fail', category: 'Unknown'},
+    {code: 'GF104', description: 'LAN Port 4 Test Fail', category: 'Unknown'},
+    {code: 'GF105', description: 'WAN Port Test Fail', category: 'Unknown'},
+    {code: 'GF106', description: 'USB1 VIA Host Init Fail', category: 'Unknown'},
+    {code: 'GF107', description: 'USB2 OTG Host Init Fail', category: 'Unknown'},
+    {code: 'GF108', description: 'USB1 Detected Fail', category: 'Unknown'},
+    {code: 'GF109', description: 'USB2 Detected Fail', category: 'Unknown'},
+    {code: 'GF110', description: 'POST Fail', category: 'Unknown'},
+    {code: 'GF111', description: 'Restart Button Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF112', description: 'Roter Button Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF113', description: 'USB Ejection Button Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF114', description: 'Device Initial Fail', category: 'General Test Function Issue'},
+    {code: 'GF115', description: 'Web Password Fail', category: 'General Test Function Issue'},
+    {code: 'GF116', description: 'Write Parameters Fail', category: 'General Test Function Issue'},
+    {code: 'GF117', description: 'Write Parameters Timeout', category: 'General Test Function Issue'},
+    {code: 'GF118', description: 'Check Parameters Timeout', category: 'General Test Function Issue'},
+    {code: 'GF119', description: 'DUT Power Consumption Check Fail', category: 'General Test Function Issue'},
+    {code: 'GF120', description: 'Load Customer Code Fail', category: 'Unknown'},
+    {code: 'GF121', description: 'Check Telnet Status Fail', category: 'General Test Function Issue'},
+    {code: 'GF122', description: 'UART Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF123', description: 'Telnet Login Fail', category: 'General Test Function Issue'},
+    {code: 'GF124', description: 'Check Work Order Fail', category: 'General Test Function Issue'},
+    {code: 'GF125', description: 'Set Regulation Domain Fail', category: 'General Test Function Issue'},
+    {code: 'GF126', description: 'Check Regulation Domain Fail', category: 'General Test Function Issue'},
+    {code: 'GF127', description: 'Set Regrev Fail', category: 'General Test Function Issue'},
+    {code: 'GF128', description: 'Check Regrev Fail', category: 'General Test Function Issue'},
+    {code: 'GF129', description: 'Check Part Number Fail', category: 'General Test Function Issue'},
+    {code: 'GF130', description: 'Switch Test Fail', category: 'Unknown'},
+    {code: 'GF131', description: 'Get Board Parameters Fail', category: 'General Test Function Issue'},
+    {code: 'GF132', description: 'Can', category: 'General Test Function Issue'},
+    {code: 'GF133', description: 'Loading Image Check Fail', category: 'General Test Function Issue'},
+    {code: 'GF134', description: 'Write Protection Fail', category: 'General Test Function Issue'},
+    {code: 'GF135', description: 'Ping Dut Until Offline Fail', category: 'General Test Function Issue'},
+    {code: 'GF136', description: 'Enable Device Fail', category: 'General Test Function Issue'},
+    {code: 'GF137', description: 'Disable Device Fail', category: 'General Test Function Issue'},
+    {code: 'GF138', description: 'DDR RAM Self Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF139', description: 'Reset DUT', category: 'General Test Function Issue'},
+    {code: 'GF140', description: 'Remove DUT Fail', category: 'Unknown'},
+    {code: 'GF141', description: 'Kill SW Process Fail', category: 'General Test Function Issue'},
+    {code: 'GF142', description: 'Software Rebooting Fail', category: 'General Test Function Issue'},
+    {code: 'GF143', description: 'Generate Username and Password Fail', category: 'General Test Function Issue'},
+    {code: 'GF144', description: 'WebUI Login Fail', category: 'General Test Function Issue'},
+    {code: 'GF145', description: 'Check PSK Fail', category: 'General Test Function Issue'},
+    {code: 'GF146', description: 'Check PWDPSK Fail', category: 'General Test Function Issue'},
+    {code: 'GF147', description: 'LED Button Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF148', description: 'Check SSL Fail', category: 'General Test Function Issue'},
+    {code: 'GF149', description: 'Detect HardDisk Fail', category: 'General Test Function Issue'},
+    {code: 'GF150', description: 'Set RTC Time Fail', category: 'Unknown'},
+    {code: 'GF151', description: 'Check RTC Time Fail', category: 'General Test Function Issue'},
+    {code: 'GF152', description: 'Check FTTH Mode Fail', category: 'General Test Function Issue'},
+    {code: 'GF153', description: 'Rework to MFG Mode Fail', category: 'General Test Function Issue'},
+    {code: 'GF154', description: 'Power Module Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF155', description: 'GPIO Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF156', description: 'LCD Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF157', description: 'Nand Flash Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF158', description: 'SPI Flash Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF159', description: 'I2C Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF160', description: 'Loop Back Test Fail', category: 'Unknown'},
+    {code: 'GF161', description: 'I2C Voltage Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF162', description: 'Set WLAN ON Fail', category: 'General Test Function Issue'},
+    {code: 'GF163', description: 'Load ART2 File Fail', category: 'General Test Function Issue'},
+    {code: 'GF164', description: 'Check Pwmon Fail', category: 'General Test Function Issue'},
+    {code: 'GF165', description: 'Check CPU Frequency Fail', category: 'General Test Function Issue'},
+    {code: 'GF166', description: 'LAN Test T1 & T2 Port Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF167', description: 'Set WLAN OFF Fail', category: 'General Test Function Issue'},
+    {code: 'GF168', description: 'Initialize ART Partition Fail', category: 'General Test Function Issue'},
+    {code: 'GF169', description: 'Lock CPU Pin Fail', category: 'General Test Function Issue'},
+    {code: 'GF170', description: 'Check Dut Current Fail', category: 'Unknown'},
+    {code: 'GF171', description: 'USB 3.0 Port Detected 2.0 Device Fail', category: 'General Test Function Issue'},
+    {code: 'GF172', description: 'USB 3.0 Port Detected 3.0 Device Fail', category: 'General Test Function Issue'},
+    {code: 'GF173', description: 'ART2 5GHz Spectral Mask Fail', category: 'General Test Function Issue'},
+    {code: 'GF174', description: 'Download Test Image Fail', category: 'General Test Function Issue'},
+    {code: 'GF175', description: 'USB 2.0 Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF176', description: 'USB 3.0 Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF177', description: 'Ping FTP Server Fail', category: 'General Test Function Issue'},
+    {code: 'GF178', description: 'Get file from FTP Server Fail', category: 'General Test Function Issue'},
+    {code: 'GF179', description: 'Get MAC from File Fail', category: 'General Test Function Issue'},
+    {code: 'GF180', description: 'Set SSL ID Fail', category: 'Unknown'},
+    {code: 'GF181', description: 'Check security File Fail', category: 'General Test Function Issue'},
+    {code: 'GF182', description: 'Check Security FW Image Fail', category: 'General Test Function Issue'},
+    {code: 'GF183', description: 'Parse data from SFIS Fail', category: 'General Test Function Issue'},
+    {code: 'GF184', description: 'Check Parameters Fail', category: 'General Test Function Issue'},
+    {code: 'GF185', description: 'Write Certificate Files Fail', category: 'General Test Function Issue'},
+    {code: 'GF186', description: 'Noise Floor Cal Fail', category: 'General Test Function Issue'},
+    {code: 'GF187', description: 'Write Cap Values to Memory Fail', category: 'General Test Function Issue'},
+    {code: 'GF188', description: 'Program Cap Values to OTP Fail', category: 'General Test Function Issue'},
+    {code: 'GF189', description: 'Check Certificate Files Fail', category: 'General Test Function Issue'},
+    {code: 'GF190', description: 'Temperature Test Fail', category: 'Unknown'},
+    {code: 'GF191', description: 'Spur Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF192     Set WiFi Up Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF193     Set WiFi Down Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF194     Set ART Stop Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF195     Update Target Power Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF196     Set FT Program Version Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF197     Local PHY Status Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF198', description: 'SDIO Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF199     Check art Mode Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF200', description: 'Check test Mode Fail', category: 'Unknown'},
+    {code: 'GF201     Check FT Program Version Fail', description: '', category: 'Unknown'},
+    {code: 'GF202     Init test Mode Fail', description: '', category: 'Unknown'},
+    {code: 'GF203     HW Switch Button Up Fail', description: '', category: 'Unknown'},
+    {code: 'GF204     HW Switch Button Down Fail', description: '', category: 'Unknown'},
+    {code: 'GF205     HW Switch Button Left Fail', description: '', category: 'Unknown'},
+    {code: 'GF206     HW Switch Button Right Fail', description: '', category: 'Unknown'},
+    {code: 'GF207     HW Switch Button Enter Fail', description: '', category: 'Unknown'},
+    {code: 'GF208     Find CA File Fail', description: '', category: 'Unknown'},
+    {code: 'GF209     Copy CA File Fail', description: '', category: 'Unknown'},
+    {code: 'GF210     Write CA File Fail', description: '', category: 'Unknown'},
+    {code: 'GF211     Init Audio Loopback Mode Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF212     Audio Test Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF213     IR TX Test Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF214     IR RX Test Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF215     Audio Record Test Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF216     Audio Play Test Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF217     Audio Analysis THD+N Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF218     Audio Analysis Power Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF219     Audio Analysis Output Level Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF220     Audio Record File Found Fail', description: '', category: 'Unknown'},
+    {code: 'GF221     Update Cal File Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF222     Set PT Program Version Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF223     Check PT Program Version Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF224     Set RF Board BOM Version Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF225     Check RF Board BOM Version Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF226     Set Mechanical BOM Version Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF227     Check Mechanical BOM Version Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF228     Set Mechanical SOP Version Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF229     Check Mechanical SOP Version Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF230', description: 'Check Wifi Chip Fail', category: 'Unknown'},
+    {code: 'GF231', description: 'Get IP From DHCP Server Fail', category: 'General Test Function Issue'},
+    {code: 'GF232     Set GFAST Mode Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF233     Check ECC Correction Count Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF234', description: 'TPM Init Fail', category: 'General Test Function Issue'},
+    {code: 'GF235', description: 'TPM Enable Fail', category: 'General Test Function Issue'},
+    {code: 'GF236', description: 'Check SN Fail', category: 'General Test Function Issue'},
+    {code: 'GF237', description: 'Set Model Name fail', category: 'General Test Function Issue'},
+    {code: 'GF238', description: 'Check Model Name fail', category: 'General Test Function Issue'},
+    {code: 'GF239', description: 'Set Speaker version fail', category: 'General Test Function Issue'},
+    {code: 'GF240', description: 'Check Speaker version fail', category: 'Unknown'},
+    {code: 'GF241', description: 'Check SSID fail', category: 'General Test Function Issue'},
+    {code: 'GF242', description: 'Open/short test fail', category: 'General Test Function Issue'},
+    {code: 'GF243', description: 'Set HwId fail', category: 'General Test Function Issue'},
+    {code: 'GF244', description: 'Check HwId fail', category: 'General Test Function Issue'},
+    {code: 'GF245', description: 'Set HwVersion fail', category: 'General Test Function Issue'},
+    {code: 'GF246', description: 'Check HwVersion fail', category: 'General Test Function Issue'},
+    {code: 'GF247', description: 'Set HwBom fail', category: 'General Test Function Issue'},
+    {code: 'GF248', description: 'Checkk HwBom fail', category: 'General Test Function Issue'},
+    {code: 'GF249', description: 'Set DataCode fail', category: 'General Test Function Issue'},
+    {code: 'GF250', description: 'Set AuthKey fail', category: 'Unknown'},
+    {code: 'GF251', description: 'Check AuthKey fail', category: 'General Test Function Issue'},
+    {code: 'GF252', description: 'Check WiFi Board Connection Fail', category: 'General Test Function Issue'},
+    {code: 'GF253', description: 'Secure Boot Enable Fail', category: 'General Test Function Issue'},
+    {code: 'GF254', description: 'Reboot Button Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF255', description: 'Display Button Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF257     Generate Board Data Fail', description: '', category: 'General Test Function Issue'},
+    {code: 'GF260', description: 'Check Firmware Version Fail', category: 'Unknown'},
+    {code: 'GF280     Upgrade Firmware Fail', description: '', category: 'Unknown'},
+    {code: 'GF281', description: 'MDIO Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF282', description: 'Micro Chip Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF283', description: 'NXP Driver Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF284', description: 'USB-C Voltage Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF285', description: 'Ping Custom IP Fail', category: 'General Test Function Issue'},
+    {code: 'GF286', description: 'Flash Read Write Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF287', description: 'Buzzer Test Fail', category: 'General Test Function Issue'},
+    {code: 'GF289', description: 'DDR Ram ID Check Fail', category: 'General Test Function Issue'},
+    {code: 'GF290', description: 'eMMC Rom ID Check Fail', category: 'Unknown'},
+    {code: 'EN001', description: 'Set COM Port Fail', category: 'Environment Issue'},
+    {code: 'EN002', description: 'Golden Unavailable', category: 'Environment Issue'},
+    {code: 'EN003', description: 'Get Network Interface Fail', category: 'Environment Issue'},
+    {code: 'EN004', description: 'Check Routing Table Fail', category: 'Environment Issue'},
+    {code: 'EN005', description: 'The Console Controller Not Response', category: 'Environment Issue'},
+    {code: 'EN006', description: 'Generate UUID Fail', category: 'Environment Issue'},
+    {code: 'EN007', description: 'Label and DUT SN Doesn\'t Match', category: 'Environment Issue'},
+    {code: 'EN008', description: 'Get SN Fail', category: 'Environment Issue'},
+    {code: 'EN009', description: 'Instrument and Fixture Init Fail', category: 'Environment Issue'},
+    {code: 'SF001', description: '', category: 'SFIS Issue'},
+    {code: 'SF002', description: '', category: 'SFIS Issue'},
+    {code: 'SF003', description: '', category: 'SFIS Issue'},
+    {code: 'SF004', description: '', category: 'SFIS Issue'},
+    {code: 'BN001', description: 'Controller Configure Fail', category: 'Burn-in Issue'},
+    {code: 'BN002', description: 'PoE Switch Configure Fail', category: 'Burn-in Issue'},
+    {code: 'BN003', description: 'Software rebooting Fail', category: 'Burn-in Issue'},
+    {code: 'BN004', description: 'Hardware rebooting Fail', category: 'Burn-in Issue'},
+    {code: 'BN005', description: 'Ping to 2.4G Client Card Fail', category: 'Burn-in Issue'},
+    {code: 'BN006', description: 'Ping to 5G Client Card Fail', category: 'Burn-in Issue'},
+    {code: 'BN007', description: 'Ping to LAN Client Card Fail', category: 'Burn-in Issue'},
+    {code: 'BN008', description: 'Ping to 5G and LAN Fail', category: 'Burn-in Issue'},
+    {code: 'BN009', description: 'Ping to 2G and LAN Fail', category: 'Burn-in Issue'},
+    {code: 'BN010', description: 'Ping to 2G and 5G Client Card Fail', category: 'Burn-in Issue'},
+    {code: 'BN011', description: 'Ping to 2G and 5G and LAN Fail', category: 'Burn-in Issue'},
+    {code: 'BN012', description: 'Hardware rebooting and Ping LAN Fail', category: 'Burn-in Issue'},
+    {code: 'BN013', description: 'Hardware rebooting and Ping to 5G Client Card', category: 'Burn-in Issue'},
+    {code: 'BN014', description: 'Hardware rebooting and Ping to 5G and LAN Fail', category: 'Burn-in Issue'},
+    {code: 'BN015', description: 'Hardware rebooting and Ping to 2G Client Card', category: 'Burn-in Issue'},
+    {code: 'BN016', description: 'Hardware rebooting and Ping to 2G and LAN Fail', category: 'Burn-in Issue'},
+    {code: 'BN017', description: 'Hardware rebooting and Ping to 2G and 5G Fail', category: 'Burn-in Issue'},
+    {code: 'BN018', description: 'Hardware rebooting and Ping to 2G and 5G and', category: 'Burn-in Issue'},
+    {code: 'BN019', description: 'Software rebooting and Ping to LAN Fail', category: 'Burn-in Issue'},
+    {code: 'BN020', description: 'Software rebooting and Ping to 5G Fail', category: 'Burn-in Issue'},
+    {code: 'BN021', description: 'Software rebooting and Ping to 5G and LAN Fail', category: 'Burn-in Issue'},
+    {code: 'BN022', description: 'Software rebooting and Ping to 2G Fail', category: 'Burn-in Issue'},
+    {code: 'BN023', description: 'Software rebooting and Ping to 2G and LAN Fail', category: 'Burn-in Issue'},
+    {code: 'BN024', description: 'Software rebooting and Ping to 2G and 5G Fail', category: 'Burn-in Issue'},
+    {code: 'BN025', description: 'Software rebooting and Ping to 2G and 5G and', category: 'Burn-in Issue'},
+    {code: 'BN026', description: 'Software rebooting and Hardware rebooting Fail', category: 'Burn-in Issue'},
+    {code: 'BN027', description: 'Software and Hardware rebooting and Ping to 5G', category: 'Burn-in Issue'},
+    {code: 'BN028', description: 'Software and Hardware rebooting and Ping to', category: 'Burn-in Issue'},
+    {code: 'BN029', description: 'Software and Hardware rebooting and Ping to 5G', category: 'Burn-in Issue'},
+    {code: 'BN030', description: 'Software and Hardware rebooting and Ping to 5G', category: 'Burn-in Issue'},
+    {code: 'BN031', description: 'Software and Hardware rebooting and Ping to 2G', category: 'Burn-in Issue'},
+    {code: 'BN032', description: 'Software and Hardware rebooting and Ping to 2G', category: 'Burn-in Issue'},
+    {code: 'BN033', description: 'Software and Hardware rebooting and Ping to 2G', category: 'Burn-in Issue'},
+    {code: 'BN034', description: 'Software and Hardware rebooting and Ping to 2G', category: 'Burn-in Issue'},
+    {code: 'BN035', description: 'Check Agingtest Result Fail', category: 'Burn-in Issue'},
+    {code: 'CC001', description: 'NFC Card Init Fail', category: 'NFC Card Issue'},
+    {code: 'CC002', description: 'Write NFC Card Data Fail', category: 'NFC Card Issue'},
+    {code: 'CC003', description: 'Check NFC Card Data Fail', category: 'NFC Card Issue'},
+    {code: 'AP001', description: 'Execute Application Fail', category: 'Test Related Application Issue'},
+    {code: 'AP002', description: 'Can\'t Start Iperf Server', category: 'Test Related Application Issue'},
+    {code: 'AP003', description: 'Set Comport control to Golden Test PC', category: 'Test Related Application Issue'},
+    {code: 'AP004', description: 'Can\'t disconnect from Golden', category: 'Test Related Application Issue'},
+    {code: 'AP005', description: 'Start Iperf Error', category: 'Test Related Application Issue'},
+    {code: 'AP006', description: 'Iperf Test Timeout', category: 'Test Related Application Issue'},
+    {code: 'AP007', description: 'Get RSSI Timeout', category: 'Test Related Application Issue'},
+    {code: 'AP008', description: 'Can\'t Set Comport to communicate with Golden', category: 'Test Related Application Issue'},
+    {code: 'AP009', description: 'Can\'t Set Iperf Server IP to golden Test PC', category: 'Test Related Application Issue'},
+    {code: 'AP010', description: 'Can\'t Set Iperf Client IP to golden Test PC', category: 'Test Related Application Issue'},
+    {code: 'AP011', description: 'Can\'t Set IPerf server command to golden Test PC', category: 'Test Related Application Issue'},
+    {code: 'AP012', description: 'Throughput Golden Server is Not Ready', category: 'Test Related Application Issue'},
+    {code: 'AP013', description: 'Can\'t Get Golden Server Information', category: 'Test Related Application Issue'},
+    {code: 'ZB001     Burn Node test Firmware Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB002     Burn Zigbee token gruop parameter Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB003     Burn ZCP Firmware Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB004     TX EVM Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB005     TX EVM-OFFSET Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB006     TX Freq Error Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB007     TX Symbol Clock Error Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB009     TX Power Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB010     TX Spectrum Mask Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB011     RX PER Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB012     RX RSSI Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB013     Zigbee Enable Test Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB014     Zigbee Host Form Test Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB015     Zigbee Client Join Test Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB016     Zigbee Host Discover Test Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB017     Zigbee Client Leave Test Fail', description: '', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB018', description: 'Check Zigbee Golden Status Fail', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB019', description: 'Check Zigbee DUT Status Fail', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB020', description: 'Zigbee Golden Telnet login Fail', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB021', description: 'Zigbee DUT Telnet login Fail', category: 'Zigbee Test Function Issue'},
+    {code: 'ZB022', description: 'Zigbee RSSI Test Fail', category: 'Zigbee Test Function Issue'},
+    {code: 'AT001', description: 'Audio test fail', category: 'Audio Test Function Issue'},
+    {code: 'AT002', description: 'Mic compare test fail', category: 'Audio Test Function Issue'},
+    {code: 'AT003', description: 'Mic Frequency response test fail', category: 'Audio Test Function Issue'},
+    {code: 'AT004', description: 'Mic THD test fail', category: 'Audio Test Function Issue'},
+    {code: 'AT005', description: 'Speaker SPL test fail', category: 'Audio Test Function Issue'},
+    {code: 'AT006', description: 'Speaker THD test fail', category: 'Audio Test Function Issue'},
+    {code: 'AT007', description: 'Speaker R&B test fail', category: 'Audio Test Function Issue'},
+    {code: 'AT008', description: 'Audio Tester Initial Fail', category: 'Audio Test Function Issue'},
+    {code: 'AT009', description: 'Status of audio Tester incorrect', category: 'Audio Test Function Issue'},
+    {code: 'AT010', description: 'Mic Seal_Delta test fail', category: 'Audio Test Function Issue'},
+    {code: 'AT011', description: 'Internal Sealing test fail', category: 'Audio Test Function Issue'},
+    {code: 'AT012', description: 'Phonejack SPL fail', category: 'Audio Test Function Issue'},
+    {code: 'AT013', description: 'Phonejack THD fail', category: 'Audio Test Function Issue'},
+    {code: 'AT014', description: 'Phonejack R&B fail', category: 'Audio Test Function Issue'},
+    {code: 'MC001', description: 'MoCA Power Level Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC002', description: 'S11 Return Loss Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC003', description: 'MoCA Throughput Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC004', description: 'MoCA TX Throughput Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC005', description: 'MoCA RX Throughput Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC006', description: 'Check MoCA Board Connection Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC008', description: 'MoCA WAN Frequency Accuracy Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC009', description: 'MoCA LAN Frequency Accuracy Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC010', description: 'MoCA WAN PHY Rate Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC011', description: 'MoCA LAN PHY Rate Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC012', description: 'MoCA WAN Return Loss Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC013', description: 'MoCA LAN Return Loss Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC014', description: 'MoCA WAN TX Power Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC015', description: 'MoCA LAN TX Power Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC016', description: 'MoCA WAN TX Throughput Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC017', description: 'MoCA WAN RX Throughput Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC018', description: 'MoCA LAN TX Throughput Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC019', description: 'MoCA LAN RX Throughput Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC020', description: 'Set MoCA LAN parameter Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'MC021', description: 'Set MoCA WAN parameter Test Fail', category: 'MoCA Test Function Issue'},
+    {code: 'ZW001', description: 'Burn Calibration FW Test Fail', category: 'Z-Wave Test Function Issue'},
+    {code: 'ZW002', description: 'Burn RF Link Test FW Fail', category: 'Z-Wave Test Function Issue'},
+    {code: 'ZW003', description: 'Burn Normal FW Fail', category: 'Z-Wave Test Function Issue'},
+    {code: 'ZW004', description: 'Z-Wave TX Test Fail', category: 'Z-Wave Test Function Issue'},
+    {code: 'ZW005', description: 'Z-Wave RX Test Fail', category: 'Z-Wave Test Function Issue'},
+    {code: 'ZW006', description: 'Z-Wave RSSI Test Fail', category: 'Z-Wave Test Function Issue'},
+    {code: 'ZW007', description: 'Z-Wave Self Calibration Test Fail', category: 'Z-Wave Test Function Issue'},
+    {code: 'ZW008', description: 'Check Z-Wave Golden Status Fail', category: 'Z-Wave Test Function Issue'},
+    {code: 'ZW009', description: 'Check Z-Wave DUT Status Fail', category: 'Z-Wave Test Function Issue'},
+    {code: 'ZW010', description: 'Z-Wave Golden Telnet login Fail', category: 'Z-Wave Test Function Issue'},
+    {code: 'ZW011', description: 'Z-Wave DUT Telnet login Fail', category: 'Z-Wave Test Function Issue'},
+  ];
+  
+  // 獲取或創建 ErrorCodes 工作表
+  let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ErrorCodes');
+  
+  if (!sheet) {
+    sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('ErrorCodes');
+    sheet.appendRow(['Code', 'Description', 'Category', 'CreatedAt']);
+  }
+  
+  // 批量匯入（每次 100 筆以避免超時）
+  const batchSize = 100;
+  let imported = 0;
+  let updated = 0;
+  
+  for (let i = 0; i < errorCodes.length; i += batchSize) {
+    const batch = errorCodes.slice(i, i + batchSize);
+    
+    batch.forEach(item => {
+      // 檢查是否已存在
+      const existing = sheet.getDataRange().getValues()
+        .slice(1)
+        .findIndex(row => row[0] === item.code);
+      
+      if (existing >= 0) {
+        // 更新現有記錄
+        sheet.getRange(existing + 2, 2).setValue(item.description);
+        sheet.getRange(existing + 2, 3).setValue(item.category);
+        updated++;
+      } else {
+        // 新增記錄
+        sheet.appendRow([item.code, item.description, item.category, new Date()]);
+        imported++;
+      }
+    });
+    
+    // 記錄進度
+    Logger.log(`已處理 ${Math.min(i + batchSize, errorCodes.length)}/${errorCodes.length} 筆`);
+  }
+  
+  const result = {
+    success: true,
+    message: `匯入完成！新增：${imported} 筆，更新：${updated} 筆`,
+    stats: {
+      total: errorCodes.length,
+      imported: imported,
+      updated: updated
+    }
+  };
+  
+  Logger.log(JSON.stringify(result));
+  return result;
+}
+
+/**
+ * 批量匯入類別數據
+ */
+function importCategories() {
+  const categories = [
+    {code: 'NT', name: 'RF Test Function Issue', description: ''},
+    {code: 'NE', name: 'EEPROM Issue', description: ''},
+    {code: 'NC', name: 'Check Value in EEPROM Issue', description: ''},
+    {code: 'NI', name: 'Instrument Issue', description: ''},
+    {code: 'NF', name: 'E-FUSE Issue', description: ''},
+    {code: 'ND', name: 'DECT Test Function Issue', description: ''},
+    {code: 'BT', name: 'Bluetooth Test Function Issue', description: ''},
+    {code: 'AL', name: 'ADSL Test Function Issue', description: ''},
+    {code: 'VL', name: 'VDSL Test Function Issue', description: ''},
+    {code: 'GT', name: 'GFAST Test Function Issue', description: ''},
+    {code: 'XL', name: 'xDSL Test Function Issue', description: ''},
+    {code: 'VP', name: 'VOIP Test Function Issue', description: ''},
+    {code: 'IS', name: 'ISDN Test Function Issue', description: ''},
+    {code: 'HM', name: 'Home Media Box Test Function Issue', description: ''},
+    {code: 'PT', name: 'Photo Test Function Issue', description: ''},
+    {code: 'PN', name: 'PON Test Function Issue', description: ''},
+    {code: 'PL', name: 'Power Line Test Function Issue', description: ''},
+    {code: 'FM', name: 'Femtocell Test Function Issue', description: ''},
+    {code: 'LT', name: 'LTE Test Function Issue', description: ''},
+    {code: 'GF', name: 'General Test Function Issue', description: ''},
+    {code: 'EN', name: 'Environment Issue', description: ''},
+    {code: 'SF', name: 'SFIS Issue', description: ''},
+    {code: 'BN', name: 'Burn-in Issue', description: ''},
+    {code: 'CC', name: 'NFC Card Issue', description: ''},
+    {code: 'AP', name: 'Test Related Application Issue', description: ''},
+    {code: 'ZB', name: 'Zigbee Test Function Issue', description: ''},
+    {code: 'AT', name: 'Audio Test Function Issue', description: ''},
+    {code: 'MC', name: 'MoCA Test Function Issue', description: ''},
+    {code: 'ZW', name: 'Z-Wave Test Function Issue', description: ''},
+  ];
+  
+  // 獲取或創建 Categories 工作表
+  let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Categories');
+  
+  if (!sheet) {
+    sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Categories');
+    sheet.appendRow(['Code', 'Name', 'Description']);
+  }
+  
+  // 清空現有數據（保留標題行）
+  if (sheet.getLastRow() > 1) {
+    sheet.getRange(2, 1, sheet.getLastRow() - 1, 3).clearContent();
+  }
+  
+  // 匯入類別
+  categories.forEach((cat, index) => {
+    sheet.appendRow([cat.code, cat.name, cat.description]);
+  });
+  
+  Logger.log(`類別匯入完成！共 ${categories.length} 個類別`);
+  return { success: true, count: categories.length };
+}
+
+/**
+ * 一鍵初始化並匯入所有數據
+ */
+function initializeAndImport() {
+  Logger.log('開始初始化...');
+  
+  // 初始化表格結構
+  initializeSheets();
+  
+  // 匯入類別
+  Logger.log('匯入類別...');
+  importCategories();
+  
+  // 匯入錯誤代碼
+  Logger.log('匯入錯誤代碼...');
+  importErrorCodes();
+  
+  Logger.log('✅ 全部完成！');
+  
+  return {
+    success: true,
+    message: '初始化和匯入完成！'
+  };
+}

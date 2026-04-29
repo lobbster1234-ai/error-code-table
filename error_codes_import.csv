@@ -1,0 +1,1218 @@
+Code,Description,Category,CreatedAt
+NT001,Can't Open Adapter,RF Test Function Issue,2026-04-29
+NT002,Configure File Initial Fail,RF Test Function Issue,2026-04-29
+NT003,Crystal Calibration Fail,RF Test Function Issue,2026-04-29
+NT004,Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT005,11A Power Calibration Fail,RF Test Function Issue,2026-04-29
+NT006,11B Power Calibration Fail,RF Test Function Issue,2026-04-29
+NT007,11G Power Calibration Fail,RF Test Function Issue,2026-04-29
+NT008,5GHz Power Calibration Fail,RF Test Function Issue,2026-04-29
+NT009,2.4GHz Power Calibration Fail,RF Test Function Issue,2026-04-29
+NT010,11A TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT011,11B TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT012,11G TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT013,5GHz 11N 20MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT014,5GHz 11N 40MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT015,2.4GHz 11N 20MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT016,2.4GHz 11N 40MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT017,11A TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT018,11B TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT019,11G TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT020,5GHz 11N 20MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT021,5GHz 11N 40MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT022,2.4GHz 11N 20MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT023,2.4GHz 11N 40MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT024,11A Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT025,11B Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT026,11G Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT027,5GHz 11N 20MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT028,5GHz 11N 40MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT029,2.4GHz 11N 20MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT030,2.4GHz 11N 40MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT031,11A TX PER Test Fail,RF Test Function Issue,2026-04-29
+NT032,11B TX PER Test Fail,RF Test Function Issue,2026-04-29
+NT033,11G TX PER Test Fail,RF Test Function Issue,2026-04-29
+NT034,5GHz 11N 20MHz TX PER Test Fail,RF Test Function Issue,2026-04-29
+NT035,5GHz 11N 40MHz TX PER Test Fail,RF Test Function Issue,2026-04-29
+NT036,2.4GHz 11N 20MHz TX PER Test Fail,RF Test Function Issue,2026-04-29
+NT037,2.4GHz 11N 40MHz TX PER Test Fail,RF Test Function Issue,2026-04-29
+NT038,11A RX FER Test Fail,RF Test Function Issue,2026-04-29
+NT039,11B RX FER Test Fail,RF Test Function Issue,2026-04-29
+NT040,11G RX FER Test Fail,RF Test Function Issue,2026-04-29
+NT041,5GHz 11N 20MHz RX FER Test Fail,RF Test Function Issue,2026-04-29
+NT042,5GHz 11N 40MHz RX FER Test Fail,RF Test Function Issue,2026-04-29
+NT043,2.4GHz 11N 20MHz RX FER Test Fail,RF Test Function Issue,2026-04-29
+NT044,2.4GHz 11N 40MHz RX FER Test Fail,RF Test Function Issue,2026-04-29
+NT045,11A RX RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT046,11B RX RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT047,11G RX RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT048,5GHz 11N 20MHz RX RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT049,5GHz 11N 40MHz RX RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT050,2.4GHz 11N 20MHz RX RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT051,2.4GHz 11N 40MHz RX RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT052,Start TX Carrier Fail,RF Test Function Issue,2026-04-29
+NT053,Start TX Continue Fail,RF Test Function Issue,2026-04-29
+NT054,Start TX Frames Fail,RF Test Function Issue,2026-04-29
+NT055,Start RX Fail,RF Test Function Issue,2026-04-29
+NT056,2.4GHz TX Throughput Test Fail,RF Test Function Issue,2026-04-29
+NT057,2.4GHz RX Throughput Test Fail,RF Test Function Issue,2026-04-29
+NT058,Command Line Fail,RF Test Function Issue,2026-04-29
+NT059,Client Is Terminated By User,RF Test Function Issue,2026-04-29
+NT060,Server Is Terminated By User,RF Test Function Issue,2026-04-29
+NT061,RX Test Fail,RF Test Function Issue,2026-04-29
+NT062,RX FER Test Fail,RF Test Function Issue,2026-04-29
+NT063,RX RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT064,5GHz TX Throughput Test Fail,RF Test Function Issue,2026-04-29
+NT065,5GHz RX Throughput Test Fail,RF Test Function Issue,2026-04-29
+NT066,2.4GHz Crystal Calibration Fail,RF Test Function Issue,2026-04-29
+NT067,5GHz Crystal Calibration Fail,RF Test Function Issue,2026-04-29
+NT068,Set PA Parameter Fail,RF Test Function Issue,2026-04-29
+NT069,5GHz 11AC 80MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT070,5GHz 11AC 80MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT071,5GHz 11AC 80MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT072,5GHz 11AC 80MHz TX PER Test Fail,RF Test Function Issue,2026-04-29
+NT073,5GHz 11AC 80MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT074,11B Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT075,11G Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT076,11A Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT077,2.4GHz 11N 20MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT078,2.4GHz 11N 40MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT079,5GHz 11N 20MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT080,5GHz 11N 40MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT081,5GHz 11AC 80MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT082,2.4GHz 11AC 40MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT083,2.4GHz 11AC 40MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT084,2.4GHz 11AC 40MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT085,2.4GHz 11AC 40MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT086,2.4GHz 11AC 40MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT087,2.4GHz 11AC 40MHz TX PER Test Fail,RF Test Function Issue,2026-04-29
+NT088,2.4GHz DC Leakage Fail,RF Test Function Issue,2026-04-29
+NT089,5GHz DC Leakage Fail,RF Test Function Issue,2026-04-29
+NT090,5G Power Capture Fail,RF Test Function Issue,2026-04-29
+NT091,2.4G Power Capture Fail,RF Test Function Issue,2026-04-29
+NT092,11B Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT093,11G Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT094,11A Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT095,2.4GHz 11N 20MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT096,2.4GHz 11N 40MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT097,5GHz 11N 20MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT098,5GHz 11N 40MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT099,5GHz 11AC 80MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT100,5GHz 11AC 20MHz Implicit Beamforming Calibration Fail,Unknown,2026-04-29
+NT101,5GHz 11AC 20MHz Implicit Beamforming Verify Fail,Unknown,2026-04-29
+NT102,2.4GHz 11AC 20MHz TX Power Verify Fail,Unknown,2026-04-29
+NT103,2.4GHz 11AC 20MHz TX EVM Test Fail,Unknown,2026-04-29
+NT104,2.4GHz 11AC 20MHz Frequency Accuracy Fail,Unknown,2026-04-29
+NT105,2.4GHz 11AC 20MHz Spectral Mask Test Fail,Unknown,2026-04-29
+NT106,2.4GHz 11AC 20MHz RX PER Test Fail,Unknown,2026-04-29
+NT107,2.4GHz 11AC 20MHz TX PER Test Fail,Unknown,2026-04-29
+NT108,5GHz 11AC 80MHz RX Gain Test Fail,Unknown,2026-04-29
+NT109,2.4GHz RX RSSI Test Fail,Unknown,2026-04-29
+NT110,5GHz RX RSSI Test Fail,Unknown,2026-04-29
+NT111,2.4GHz Implicit Beamforming Verify Fail,RF Test Function Issue,2026-04-29
+NT112,2.4GHz RX Calibration Fail,RF Test Function Issue,2026-04-29
+NT113,5GHz RX Calibration Fail,RF Test Function Issue,2026-04-29
+NT114,5GHz 11AC 40MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT115,5GHz 11AC 40MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT116,5GHz 11AC 40MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT117,5GHz 11AC 40MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT118,5GHz 11AC 20MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT119,5GHz 11AC 20MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT120,5GHz 11AC 20MHz Frequency Accuracy Fail,Unknown,2026-04-29
+NT121,5GHz 11AC 20MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT122,Check PA Parameter Fail,RF Test Function Issue,2026-04-29
+NT123,5GHz 11AC 20MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT124,5GHz Implicit Beamforming Verify Fail,RF Test Function Issue,2026-04-29
+NT125,5GHz 11AC 40MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT126,2.4GHz 11AC 80MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT127,2.4GHz 11AC 80MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT128,2.4GHz 11AC 80MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT129,2.4GHz 11AC 80MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT130,2.4GHz 11AC 80MHz RX PER Test Fail,Unknown,2026-04-29
+NT131,2.4GHz Implicit Beamforming Calibration Fail,RF Test Function Issue,2026-04-29
+NT132,5GHz Implicit Beamforming Calibration Fail,RF Test Function Issue,2026-04-29
+NT133,Send Command to DUT Fail,RF Test Function Issue,2026-04-29
+NT134,5.8G PER Power Fail,RF Test Function Issue,2026-04-29
+NT135,5.2G PER Power Fail,RF Test Function Issue,2026-04-29
+NT136,5.8G Sync Test Fail,RF Test Function Issue,2026-04-29
+NT137,5.2G Sync Test Fail,RF Test Function Issue,2026-04-29
+NT138,5.8G CCH Test Fail,RF Test Function Issue,2026-04-29
+NT139,5.2G CCH Test Fail,RF Test Function Issue,2026-04-29
+NT140,5.8G RF Power Fail,Unknown,2026-04-29
+NT141,5.2G RF Power Fail,RF Test Function Issue,2026-04-29
+NT142,5.8G PER(GT/DR) Fail,RF Test Function Issue,2026-04-29
+NT143,5.2G PER(GT/DR) Fail,RF Test Function Issue,2026-04-29
+NT144,5GHz 11AX 20MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT145,5GHz 11AX 20MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT146,5GHz 11AX 20MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT147,5GHz 11AX 20MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT148,5GHz 11AX 20MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT149,5GHz 11AX 40MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT150,5GHz 11AX 40MHz TX EVM Test Fail,Unknown,2026-04-29
+NT151,5GHz 11AX 40MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT152,5GHz 11AX 40MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT153,5GHz 11AX 40MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT154,5GHz 11AX 80MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT155,5GHz 11AX 80MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT156,5GHz 11AX 80MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT157,5GHz 11AX 80MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT158,5GHz 11AX 80MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT159,5GHz 11AX 160MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT160,5GHz 11AX 160MHz TX EVM Test Fail,Unknown,2026-04-29
+NT161,5GHz 11AX 160MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT162,5GHz 11AX 160MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT163,5GHz 11AX 160MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT164,2.4GHz 11AX 20MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT165,2.4GHz 11AX 20MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT166,2.4GHz 11AX 20MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT167,2.4GHz 11AX 20MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT168,2.4GHz 11AX 20MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT169,2.4GHz 11AX 40MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT170,2.4GHz 11AX 40MHz TX EVM Test Fail,Unknown,2026-04-29
+NT171,2.4GHz 11AX 40MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT172,2.4GHz 11AX 40MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT173,2.4GHz 11AX 40MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT174,TX DPD Calibration Fail,RF Test Function Issue,2026-04-29
+NT175,RXSELFTEST Fail,RF Test Function Issue,2026-04-29
+NT176,TX RX PRE CAL Fail,RF Test Function Issue,2026-04-29
+NT177,Run DUT Command Fail,RF Test Function Issue,2026-04-29
+NT178,ZWDFS Verify Fail,RF Test Function Issue,2026-04-29
+NT179,6GHz Power Calibration Fail,RF Test Function Issue,2026-04-29
+NT180,6GHz Implicit Beamforming Calibration Fail,Unknown,2026-04-29
+NT181,6GHz Implicit Beamforming Verify Fail,RF Test Function Issue,2026-04-29
+NT182,6GHz RX Calibration Fail,RF Test Function Issue,2026-04-29
+NT183,6GHz 11AX 20MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT184,6GHz 11AX 20MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT185,6GHz 11AX 20MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT186,6GHz 11AX 20MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT187,6GHz 11AX 20MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT188,6GHz 11AX 20MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT189,6GHz 11AX 40MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT190,6GHz 11AX 40MHz TX EVM Test Fail,Unknown,2026-04-29
+NT191,6GHz 11AX 40MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT192,6GHz 11AX 40MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT193,6GHz 11AX 40MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT194,6GHz 11AX 40MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT195,6GHz 11AX 80MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT196,6GHz 11AX 80MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT197,6GHz 11AX 80MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT198,6GHz 11AX 80MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT199,6GHz 11AX 80MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT200,6GHz 11AX 80MHz RX PER Test Fail,Unknown,2026-04-29
+NT201,6GHz 11AX 160MHz TX Power Verify Fail,Unknown,2026-04-29
+NT202,6GHz 11AX 160MHz TX EVM Test Fail,Unknown,2026-04-29
+NT203,6GHz 11AX 160MHz Frequency Accuracy Fail,Unknown,2026-04-29
+NT204,6GHz 11AX 160MHz Symbol Clock Error Fail,Unknown,2026-04-29
+NT205,6GHz 11AX 160MHz Spectral Mask Test Fail,Unknown,2026-04-29
+NT206,6GHz 11AX 160MHz RX PER Test Fail,Unknown,2026-04-29
+NT207,6GHz TX Throughput Test Fail,Unknown,2026-04-29
+NT208,6GHz RX Throughput Test Fail,Unknown,2026-04-29
+NT209,6GHz RX RSSI Test Fail,Unknown,2026-04-29
+NT210,AVS Vcore Test Fail,Unknown,2026-04-29
+NT211,2.4GHz Ant1 RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT212,2.4GHz Ant2 RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT213,2.4GHz Ant3 RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT214,2.4GHz Ant4 RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT215,5GHz Ant1 RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT216,5GHz Ant2 RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT217,5GHz Ant3 RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT218,5GHz Ant4 RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT219,6GHz Ant1 RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT220,6GHz Ant2 RSSI Test Fail,Unknown,2026-04-29
+NT221,6GHz Ant3 RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT222,6GHz Ant4 RSSI Test Fail,RF Test Function Issue,2026-04-29
+NT223,6GHz 11BE 20MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT224,6GHz 11BE 20MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT225,6GHz 11BE 20MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT226,6GHz 11BE 20MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT227,6GHz 11BE 20MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT228,6GHz 11BE 20MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT229,6GHz 11BE 40MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT230,6GHz 11BE 40MHz TX EVM Test Fail,Unknown,2026-04-29
+NT231,6GHz 11BE 40MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT232,6GHz 11BE 40MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT233,6GHz 11BE 40MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT234,6GHz 11BE 40MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT235,6GHz 11BE 80MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT236,6GHz 11BE 80MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT237,6GHz 11BE 80MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT238,6GHz 11BE 80MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT239,6GHz 11BE 80MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT240,6GHz 11BE 80MHz RX PER Test Fail,Unknown,2026-04-29
+NT241,6GHz 11BE 160MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT242,6GHz 11BE 160MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT243,6GHz 11BE 160MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT244,6GHz 11BE 160MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT245,6GHz 11BE 160MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT246,6GHz 11BE 160MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT247,6GHz 11BE 320MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT248,6GHz 11BE 320MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT249,6GHz 11BE 320MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT250,6GHz 11BE 320MHz Symbol Clock Error Fail,Unknown,2026-04-29
+NT251,6GHz 11BE 320MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT252,6GHz 11BE 320MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT253,2.4GHz 11BE 20MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT254,2.4GHz 11BE 20MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT255,2.4GHz 11BE 20MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT256,2.4GHz 11BE 20MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT257,2.4GHz 11BE 20MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT258,2.4GHz 11BE 20MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT259,2.4GHz 11BE 40MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT260,2.4GHz 11BE 40MHz TX EVM Test Fail,Unknown,2026-04-29
+NT261,2.4GHz 11BE 40MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT262,2.4GHz 11BE 40MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT263,2.4GHz 11BE 40MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT264,2.4GHz 11BE 40MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT265,5GHz 11BE 20MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT266,5GHz 11BE 20MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT267,5GHz 11BE 20MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT268,5GHz 11BE 20MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT269,5GHz 11BE 20MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT270,5GHz 11BE 20MHz RX PER Test Fail,Unknown,2026-04-29
+NT271,5GHz 11BE 40MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT272,5GHz 11BE 40MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT273,5GHz 11BE 40MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT274,5GHz 11BE 40MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT275,5GHz 11BE 40MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT276,5GHz 11BE 40MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT277,5GHz 11BE 80MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT278,5GHz 11BE 80MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT279,5GHz 11BE 80MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT280,5GHz 11BE 80MHz Symbol Clock Error Fail,Unknown,2026-04-29
+NT281,5GHz 11BE 80MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT282,5GHz 11BE 80MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT283,5GHz 11BE 160MHz TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT284,5GHz 11BE 160MHz TX EVM Test Fail,RF Test Function Issue,2026-04-29
+NT285,5GHz 11BE 160MHz Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NT286,5GHz 11BE 160MHz Symbol Clock Error Fail,RF Test Function Issue,2026-04-29
+NT287,5GHz 11BE 160MHz Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT288,5GHz 11BE 160MHz RX PER Test Fail,RF Test Function Issue,2026-04-29
+NT289,6GHz 11A TX Power Verify Fail,RF Test Function Issue,2026-04-29
+NT290,6GHz 11A TX EVM Test Fail,Unknown,2026-04-29
+NT291,6GHz 11A Spectral Mask Test Fail,RF Test Function Issue,2026-04-29
+NT292,6GHz 11A RX FER Test Fail,RF Test Function Issue,2026-04-29
+NT293,6GHz 11A Frequency Accuracy Fail,RF Test Function Issue,2026-04-29
+NE001,Program EEPROM Fail,EEPROM Issue,2026-04-29
+NE002,Get Value From EEPROM Fail,EEPROM Issue,2026-04-29
+NC001,Check MAC Address Fail,Check Value in EEPROM Issue,2026-04-29
+NC002,Check PNPID Fail,Check Value in EEPROM Issue,2026-04-29
+NC003,Check Country Code Fail,Check Value in EEPROM Issue,2026-04-29
+NC004,Check RF Type Fail,Check Value in EEPROM Issue,2026-04-29
+NI001,,Instrument Issue,2026-04-29
+NI002,,Instrument Issue,2026-04-29
+NI003,,Instrument Issue,2026-04-29
+NI004,,Instrument Issue,2026-04-29
+NI005,,Instrument Issue,2026-04-29
+NI006,,Instrument Issue,2026-04-29
+NI007,,Instrument Issue,2026-04-29
+NI008,,Instrument Issue,2026-04-29
+NI009,,Instrument Issue,2026-04-29
+NI010,,Instrument Issue,2026-04-29
+NI011,,Instrument Issue,2026-04-29
+NI012,,Instrument Issue,2026-04-29
+NI013,,Instrument Issue,2026-04-29
+NI014,,Instrument Issue,2026-04-29
+NI015,,Instrument Issue,2026-04-29
+NF001,E-FUSE Had Been Programmed,E-FUSE Issue,2026-04-29
+NF002,Get Value From Map File Fail,E-FUSE Issue,2026-04-29
+NF003,No free eFuse block,E-FUSE Issue,2026-04-29
+NF004,E-FUSE Doesn't Have Enough Free Block,E-FUSE Issue,2026-04-29
+NF005,E-FUSE Check Test Fail,E-FUSE Issue,2026-04-29
+ND001,Sync Test Fail,DECT Test Function Issue,2026-04-29
+ND002,NTP Test Fail,DECT Test Function Issue,2026-04-29
+ND003,Mask Test Fail,DECT Test Function Issue,2026-04-29
+ND004,B-Field Test Fail,DECT Test Function Issue,2026-04-29
+ND005,Frequency Offset Test Fail,DECT Test Function Issue,2026-04-29
+ND006,Frequency Drift Test Fail,DECT Test Function Issue,2026-04-29
+ND007,Time Accuracy Test Fail,DECT Test Function Issue,2026-04-29
+ND008,Jitter Test Fail,DECT Test Function Issue,2026-04-29
+ND009,BER FER Test Fail,DECT Test Function Issue,2026-04-29
+ND010,DECT Registion Button Test Fail,DECT Test Function Issue,2026-04-29
+ND011,DECT Paging Button Test Fail,DECT Test Function Issue,2026-04-29
+ND012,DECTPhone Test Fail,DECT Test Function Issue,2026-04-29
+ND013     Set DECT PIN Fail,,DECT Test Function Issue,2026-04-29
+ND014     DECT Normal Mode Fail,,DECT Test Function Issue,2026-04-29
+ND015     DECT TBR6 Mode Fail,,DECT Test Function Issue,2026-04-29
+BT001,BT/BDR Output Power Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT002,BT/BDR Power Control Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT003,BT/BDR Modulation Characteristics Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT004,BT/BDR Initial Carrier Frequency Tolerance Test,Bluetooth Test Function Issue,2026-04-29
+BT005,BT/BDR Carrier Drift Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT006,BT/BDR Single Slot Sensitivity Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT007,BT/BDR Multi Slot Sensitivity Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT008,BT/BDR/EDR Maximum Input Level Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT009,BT/EDR Enter Test Mode Fail,Bluetooth Test Function Issue,2026-04-29
+BT010,BT/EDR Download Firmware Fail,Bluetooth Test Function Issue,2026-04-29
+BT011,BT/EDR Connect to Bluetooth adapter Fail,Bluetooth Test Function Issue,2026-04-29
+BT012,BT/EDR Spectrum Mask Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT013,BT/EDR Omega Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT014,BT/EDR DEVM Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT015,BT/EDR Power Diff Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT016,BT BER Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT017,BT/EDR Output Power Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT018,BT/LE Output Power Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT019,BT/LE Modulation Characteristics Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT020,BT/LE Frequency Device Sync Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT021,BT/BDR BER Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT022,BT/EDR BER Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT023,BT/LE BER Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT024,BT/EDR Initial Carrier Frequency Tolerance Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT025,BT/EDR Relative Power Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT026,BT/EDR Carrier Stability and Modulation,Bluetooth Test Function Issue,2026-04-29
+BT027,BT/EDR Differential Phase Encoding Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT028,Check Bluetooth MAC Fail,Bluetooth Test Function Issue,2026-04-29
+BT029,Set Bluetooth MAC Fail,Bluetooth Test Function Issue,2026-04-29
+BT030,Read Bluetooth MAC Fail,Bluetooth Test Function Issue,2026-04-29
+BT031,Scan BT Device Fail,Bluetooth Test Function Issue,2026-04-29
+BT032,Write BT UUID Fail,Bluetooth Test Function Issue,2026-04-29
+BT033,BT/BDR Frequency Delta Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT034,BT/LE Output Power Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT035,BT/LE Initial Carrier Frequency Tolerance Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT036,BT/LE Frequency Delta Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT037,BT/LE Radio Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT038,Check BT UUID Fail,Bluetooth Test Function Issue,2026-04-29
+BT039,BT/LE Golden Telnet login Fail,Bluetooth Test Function Issue,2026-04-29
+BT040,BT/LE DUT Telnet login Fail,Bluetooth Test Function Issue,2026-04-29
+BT041,BT/LE Golden Read MAC Fail,Bluetooth Test Function Issue,2026-04-29
+BT042,BT/LE DUT Read MAC Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT043,BT/LE Golden Check Status Fail,Bluetooth Test Function Issue,2026-04-29
+BT044,BT/LE DUT Check Status Fail,Bluetooth Test Function Issue,2026-04-29
+BT045,BT/LE Golden Throughput Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT046,BT/LE DUT Throughput Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT047,BT/LE Golden RSSI Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT048,BT/LE Dut RSSI Test Fail,Bluetooth Test Function Issue,2026-04-29
+BT049,BT/LE xtal calibration fail,Bluetooth Test Function Issue,2026-04-29
+BT050,BT/LE Frequency Delta ratio test fail,Bluetooth Test Function Issue,2026-04-29
+BT051,BT/LE Rx PER fail,Bluetooth Test Function Issue,2026-04-29
+BT052,Burn BLE NCP FW Fail,Bluetooth Test Function Issue,2026-04-29
+BT053,Write BT crystal fail,Bluetooth Test Function Issue,2026-04-29
+BT054,BT test parameter fail,Bluetooth Test Function Issue,2026-04-29
+AL001,Get ADSL Channel Rate Fail,ADSL Test Function Issue,2026-04-29
+AL002,Check ADSL Channel Rate Fail,ADSL Test Function Issue,2026-04-29
+AL003,Get ADSL CRC Error Fail,ADSL Test Function Issue,2026-04-29
+AL004,Check ADSL CRC Error Fail,ADSL Test Function Issue,2026-04-29
+AL005,Get ADSL Noise Margin Fail,ADSL Test Function Issue,2026-04-29
+AL006,Check ADSL Noise Margin Fail,ADSL Test Function Issue,2026-04-29
+VL001,Get VDSL Channel Rate Fail,VDSL Test Function Issue,2026-04-29
+VL002,Check VDSL Channel Rate Fail,VDSL Test Function Issue,2026-04-29
+GT001     Get GFAST Channel Rate Fail,,GFAST Test Function Issue,2026-04-29
+GT002     Check GFAST Channel Rate Fail,,GFAST Test Function Issue,2026-04-29
+XL001,Get ADSL Annex A Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL002,Check ADSL Annex A Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL003,Get ADSL Annex B Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL004,Check ADSL Annex B Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL005,Get ADSL2 Annex A Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL006,Check ADSL2 Annex A Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL007,Get ADSL2 Annex B Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL008,Check ADSL2 Annex B Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL009,Get ADSL2+ Annex A Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL010,Check ADSL2+ Annex A Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL011,Get ADSL2+ Annex B Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL012,Check ADSL2+ Annex B Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL013,Get VDSL Annex A Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL014,Check VDSL Annex A Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL015,Get VDSL Annex B Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL016,Check VDSL Annex B Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL017,Get VDSL2 Annex A Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL018,Check VDSL2 Annex A Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL019,Get VDSL2 Annex B Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+XL020,Check VDSL2 Annex B Channel Rate Fail,xDSL Test Function Issue,2026-04-29
+VP001,On Hook Fail,VOIP Test Function Issue,2026-04-29
+VP002,Change Port Fail,VOIP Test Function Issue,2026-04-29
+VP003,FXS DCV Test Fail,VOIP Test Function Issue,2026-04-29
+VP004,FXS Ring Test Fail,VOIP Test Function Issue,2026-04-29
+VP005,1K Voice Test Fail,VOIP Test Function Issue,2026-04-29
+VP006,Quiet Noise Test Fail,VOIP Test Function Issue,2026-04-29
+VP007,FXS Rx DTMF Test Fail,VOIP Test Function Issue,2026-04-29
+VP008,FXS Tx DTMF Test Fail,VOIP Test Function Issue,2026-04-29
+VP009,FXO Ring Test Fail,VOIP Test Function Issue,2026-04-29
+VP010,FXO Rx DTMF Test Fail,VOIP Test Function Issue,2026-04-29
+VP011,FXO Tx DTMF Test Fail,VOIP Test Function Issue,2026-04-29
+VP012,Relay Test Fail,VOIP Test Function Issue,2026-04-29
+VP013,FXS1 Ring Test Fail,VOIP Test Function Issue,2026-04-29
+VP014,FXS2 Ring Test Fail,VOIP Test Function Issue,2026-04-29
+VP015,VOIP Init Fail,VOIP Test Function Issue,2026-04-29
+VP016,Off Hook Fail,VOIP Test Function Issue,2026-04-29
+VP017,FXS Phone Detect Fail,VOIP Test Function Issue,2026-04-29
+IS001,,ISDN Test Function Issue,2026-04-29
+IS002,,ISDN Test Function Issue,2026-04-29
+IS003,,ISDN Test Function Issue,2026-04-29
+HM001,HDMI Video Fail,Home Media Box Test Function Issue,2026-04-29
+HM002,HDMI Audio Fail,Home Media Box Test Function Issue,2026-04-29
+HM003,CVBS Video Fail,Home Media Box Test Function Issue,2026-04-29
+HM004,CVBS Audio Fail,Home Media Box Test Function Issue,2026-04-29
+HM005,SCART CVBS Video Fail,Home Media Box Test Function Issue,2026-04-29
+HM006,SCART CVBS Audio Fail,Home Media Box Test Function Issue,2026-04-29
+HM007,RGB Video Fail,Home Media Box Test Function Issue,2026-04-29
+HM008,RGB Audio Fail,Home Media Box Test Function Issue,2026-04-29
+HM009,SVIDEO Fail,Home Media Box Test Function Issue,2026-04-29
+HM010,YPbPr Video Fail,Home Media Box Test Function Issue,2026-04-29
+HM011,YPbPr Audio Fail,Home Media Box Test Function Issue,2026-04-29
+HM012,SPDIF COAXIAL Fail,Home Media Box Test Function Issue,2026-04-29
+HM013,SPDIF OPTICAL Fail,Home Media Box Test Function Issue,2026-04-29
+HM014,IR Receiver Fail,Home Media Box Test Function Issue,2026-04-29
+HM015,7-SEG LED Fail,Home Media Box Test Function Issue,2026-04-29
+HM016,SATA Fail,Home Media Box Test Function Issue,2026-04-29
+HM017,Fast Blanking Voltage Fail,Home Media Box Test Function Issue,2026-04-29
+HM018,Switch Voltage Fail,Home Media Box Test Function Issue,2026-04-29
+HM019,Headphone Jack Fail,Home Media Box Test Function Issue,2026-04-29
+HM020,OTP Fail,Home Media Box Test Function Issue,2026-04-29
+HM021,DVB-T Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM022,SD Card Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM023,HDCP Code Fail,Home Media Box Test Function Issue,2026-04-29
+HM024,CEC Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM025,Compare Blob Fail,Home Media Box Test Function Issue,2026-04-29
+HM026,Download Key File Fail,Home Media Box Test Function Issue,2026-04-29
+HM027,Download Image Fail,Home Media Box Test Function Issue,2026-04-29
+HM028,Clear Env Fail,Home Media Box Test Function Issue,2026-04-29
+HM029,Check Security Image Fail,Home Media Box Test Function Issue,2026-04-29
+HM030,HDMI Picture Compare Fail,Home Media Box Test Function Issue,2026-04-29
+HM031,HDMI DDC Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM032,MD5 Check Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM033,HDMI ARC Picture Compare Fail,Home Media Box Test Function Issue,2026-04-29
+HM034,Emmc Throughput Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM035,Set Boot Env Fail,Home Media Box Test Function Issue,2026-04-29
+HM036,Set Access Finish Stage Fail,Home Media Box Test Function Issue,2026-04-29
+HM037,Check Access Finish Stage Fail,Home Media Box Test Function Issue,2026-04-29
+HM038,Set BT Test Mode Fail,Home Media Box Test Function Issue,2026-04-29
+HM039,DRM Key Injection Fail,Home Media Box Test Function Issue,2026-04-29
+HM040,Check Bolt Version Fail,Home Media Box Test Function Issue,2026-04-29
+HM041,Find DRM Key Fail,Home Media Box Test Function Issue,2026-04-29
+HM042,Find HDCP Key Fail,Home Media Box Test Function Issue,2026-04-29
+HM043,Get DRM MD5 Fail,Home Media Box Test Function Issue,2026-04-29
+HM044,Write OtpMsp Fail,Home Media Box Test Function Issue,2026-04-29
+HM045,Set to Android Recovery Mode Fail,Home Media Box Test Function Issue,2026-04-29
+HM046,Get AES MD5 Fail,Home Media Box Test Function Issue,2026-04-29
+HM047,Get Mediaroom MD5 Fail,Home Media Box Test Function Issue,2026-04-29
+HM048,Find AES Key Fail,Home Media Box Test Function Issue,2026-04-29
+HM049,Find Mediaroom Key Fai,Home Media Box Test Function Issue,2026-04-29
+HM050,Write OtpMsp3 Fail,Home Media Box Test Function Issue,2026-04-29
+HM051,Check MrIPTv Fail,Home Media Box Test Function Issue,2026-04-29
+HM052,AES/Mediaroom Key Injection Fail,Home Media Box Test Function Issue,2026-04-29
+HM053,Get EDAC MD5 Fail,Home Media Box Test Function Issue,2026-04-29
+HM054,Check EDAC Fail,Home Media Box Test Function Issue,2026-04-29
+HM055,Check Wifi MAC Fail,Home Media Box Test Function Issue,2026-04-29
+HM056,Check LAN MAC Fail,Home Media Box Test Function Issue,2026-04-29
+HM057,Check SN Fail,Home Media Box Test Function Issue,2026-04-29
+HM058,HDMI Re-Open Fail,Home Media Box Test Function Issue,2026-04-29
+HM059,Capture Log Fail,Home Media Box Test Function Issue,2026-04-29
+HM060,Read Capture Log Fail,Home Media Box Test Function Issue,2026-04-29
+HM061,Check CPU Type Fail,Home Media Box Test Function Issue,2026-04-29
+HM062,Update to Default Fail,Home Media Box Test Function Issue,2026-04-29
+HM063,Load Test Image From USB Fail,Home Media Box Test Function Issue,2026-04-29
+HM064,Get VM Chip ID Fail,Home Media Box Test Function Issue,2026-04-29
+HM065,Check Rework Uart Issue Fail,Home Media Box Test Function Issue,2026-04-29
+HM066,Rework Uart Issue Fail,Home Media Box Test Function Issue,2026-04-29
+HM067,DCB Certificate fail,Home Media Box Test Function Issue,2026-04-29
+HM068,HDD Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM069,DVB-S Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM070,Get Emmc Name Fail,Home Media Box Test Function Issue,2026-04-29
+HM071,Get CPU UID Fail,Home Media Box Test Function Issue,2026-04-29
+HM072,BP3 Provision Fail,Home Media Box Test Function Issue,2026-04-29
+HM073,Parsing BP3 Bin and Provision Log Fail,Home Media Box Test Function Issue,2026-04-29
+HM074,Check BP3 Provision Fail,Home Media Box Test Function Issue,2026-04-29
+HM075,Show BP3 Key Status Fail,Home Media Box Test Function Issue,2026-04-29
+HM076,Create CA Default Partition Fail,Home Media Box Test Function Issue,2026-04-29
+HM077,Get CDSN Fail,Home Media Box Test Function Issue,2026-04-29
+HM078,Create CA Private Data Fail,Home Media Box Test Function Issue,2026-04-29
+HM079,Write CA 51 Key Fail,Home Media Box Test Function Issue,2026-04-29
+HM080,Check CA Value Fail,Home Media Box Test Function Issue,2026-04-29
+HM081,Generate CA Report Fail,Home Media Box Test Function Issue,2026-04-29
+HM082,OTA Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM083,Get Final Version Fail,Home Media Box Test Function Issue,2026-04-29
+HM084,Set Android Boot Command Fail,Home Media Box Test Function Issue,2026-04-29
+HM085,Check CSSN Label Fail,Home Media Box Test Function Issue,2026-04-29
+HM086,Check GPT Table Fail,Home Media Box Test Function Issue,2026-04-29
+HM086,Check GPT Table Fail,Home Media Box Test Function Issue,2026-04-29
+HM087,Get ACAS ID Fail,Home Media Box Test Function Issue,2026-04-29
+HM088,Check ACAS ID Fail,Home Media Box Test Function Issue,2026-04-29
+HM089,Check BBS Port Fail,Home Media Box Test Function Issue,2026-04-29
+HM090,Get Temperature Fail,Home Media Box Test Function Issue,2026-04-29
+HM091,FAN Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM092,Enable FAN Fail,Home Media Box Test Function Issue,2026-04-29
+HM093,Disable FAN Fail,Home Media Box Test Function Issue,2026-04-29
+HM094,Creat FAT32 Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM095,Write All Key Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM096,Get All Key Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM097,Check DRMID Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM098,DVB-C Test Fail,Home Media Box Test Function Issue,2026-04-29
+HM099,Emmc Speed Fail,Home Media Box Test Function Issue,2026-04-29
+HM100,Create Default WiFi Calibration File Fail,Unknown,2026-04-29
+HM101,Test Tuner Fail,Unknown,2026-04-29
+HM102,Check CCAS Test Fail,Unknown,2026-04-29
+HM103,Enable Emmc Reset Fail,Unknown,2026-04-29
+HM104,Power Down Test Fail,Unknown,2026-04-29
+HM105,Check DRMID with SFIS Fail,Unknown,2026-04-29
+HM106,Open Camera Fail,Unknown,2026-04-29
+HM107,Capture Photo Fail,Unknown,2026-04-29
+HM108,Transfer Photo Fail,Unknown,2026-04-29
+HM109,RGB Capture Test Fail,Unknown,2026-04-29
+HM110,Slider Test Fail,Unknown,2026-04-29
+HM111,EDID Test Fail,Home Media Box Test Function Issue,2026-04-29
+PT001,Photo test fail,Photo Test Function Issue,2026-04-29
+PT002,SFR/MTF test fail,Photo Test Function Issue,2026-04-29
+PT003,RGB color accuracy test fail,Photo Test Function Issue,2026-04-29
+PT004,Color shading test fail,Photo Test Function Issue,2026-04-29
+PT005,Lens shading test fail,Photo Test Function Issue,2026-04-29
+PT006,Particle test fail,Photo Test Function Issue,2026-04-29
+PT007,Hot pixel test fail,Photo Test Function Issue,2026-04-29
+PT008,Bad pixel test fail,Photo Test Function Issue,2026-04-29
+PT009,Distortion test fail,Photo Test Function Issue,2026-04-29
+PT010,Shift test fail,Photo Test Function Issue,2026-04-29
+PN005,Telnet_Ftp_FH Fail,PON Test Function Issue,2026-04-29
+PN101,Check CMA50 Fail,Unknown,2026-04-29
+PN102,Check Optical Power Fail,Unknown,2026-04-29
+PN103,Connect to Optical Power Meter Fail,Unknown,2026-04-29
+PN104,Optical Loss Check Fail,Unknown,2026-04-29
+PN105,Enable Laser TX via CLI Fail,Unknown,2026-04-29
+PN106,Disable Laser TX via CLI Fail,Unknown,2026-04-29
+PN201,CLI_PON_RXlink_Check Fail,Unknown,2026-04-29
+PN202,Wait PON_RX String Fail,Unknown,2026-04-29
+PN203,Web_PON_RXlink_Check Fail,Unknown,2026-04-29
+PN204,Write TSSI Fail,Unknown,2026-04-29
+PN205,PON Throughput Test Fail,Unknown,2026-04-29
+PN206,Check TSSI Fail,Unknown,2026-04-29
+PN301,Telnet_C242_ONU Fail,Unknown,2026-04-29
+PN500,Detect BOSA Module Cal Data File From Data,Unknown,2026-04-29
+PN501,Set BOSA DDMI Data Fail,Unknown,2026-04-29
+PN502,Set BOSA Target Data Fail,Unknown,2026-04-29
+PN503,Set BOSA Laser TX PWR Fail,Unknown,2026-04-29
+PN504,Set BOSA Laser RX PWR Fail,Unknown,2026-04-29
+PN505,Set BOSA LU Table Fail,Unknown,2026-04-29
+PN506,Set BOSA A0 Table Fail,Unknown,2026-04-29
+PN507,Check BOSA DDMI Fail,Unknown,2026-04-29
+PN508,Check BOSA Target Fail,Unknown,2026-04-29
+PN509,Check BOSA TX PWR Fail,Unknown,2026-04-29
+PN510,Check BOSA RX PWR Fail,Unknown,2026-04-29
+PN511,Check BOSA LU Table Fail,PON Test Function Issue,2026-04-29
+PN512,Check BOSA A0 Table Fail,PON Test Function Issue,2026-04-29
+PN513,Check Test Fixture OLT Fail,PON Test Function Issue,2026-04-29
+PN514,OLT Side Start to PRBS Mode Fail,PON Test Function Issue,2026-04-29
+PN515,ONT Side Set PRBS Command Fail,PON Test Function Issue,2026-04-29
+PN516,ONT Side Pre PRBS Test Fail,PON Test Function Issue,2026-04-29
+PN517,ONT Side PRBS Test Fail,PON Test Function Issue,2026-04-29
+PN518,BOSA Calibration TX Test Fail,PON Test Function Issue,2026-04-29
+PN519,BOSA Eye Diagram Test Fail,PON Test Function Issue,2026-04-29
+PN520,Check ONT connect Success from OLT Side Fail,Unknown,2026-04-29
+PN521,Check OLT Enable Fail,PON Test Function Issue,2026-04-29
+PN522,Check ONT Signal Level from OLT Fail,PON Test Function Issue,2026-04-29
+PN523,ONT Check MAC Base Fail,PON Test Function Issue,2026-04-29
+PN524,ONT Check MAC address number Fail,PON Test Function Issue,2026-04-29
+PN525,Set to Normal Mode Fail,PON Test Function Issue,2026-04-29
+PN528,Check Serial Number Fail,PON Test Function Issue,2026-04-29
+PN529,BOSA Eye Diagram Test Fail,PON Test Function Issue,2026-04-29
+PN530,BOSA Eye Diagram ER Test Fail,Unknown,2026-04-29
+PN531,BOSA Eye Diagram P-P Jitter Test Fail,PON Test Function Issue,2026-04-29
+PN532,BOSA Eye Diagram Mask Margin Test Fail,PON Test Function Issue,2026-04-29
+PN533,BOSA Eye Diagram Avg Power Check Fail,PON Test Function Issue,2026-04-29
+PN535,BOSA Eye Diagram Crossing and ER Test Fail,PON Test Function Issue,2026-04-29
+PN536,OLT Side Set IS Fail,PON Test Function Issue,2026-04-29
+PN537,BOSA Calibration RX Test Fail,PON Test Function Issue,2026-04-29
+PN538,OLT Side Set OOS Fail,PON Test Function Issue,2026-04-29
+PN539,BOSA Calibration RX Test Set Attenuator Fail,PON Test Function Issue,2026-04-29
+PN540,BOSA Load Test Image Fail,Unknown,2026-04-29
+PN541,Check OLT link to ONU Fail,PON Test Function Issue,2026-04-29
+PN542,Check Ethernet Link Status Fail,PON Test Function Issue,2026-04-29
+PN543,Can't execute NuServerAP.exe,PON Test Function Issue,2026-04-29
+PN544,Check BOSA RX DDMI Too High,PON Test Function Issue,2026-04-29
+PN545,Check BOSA RX DDMI Too Low,PON Test Function Issue,2026-04-29
+PN546,Get BOSA RX DDMI Fail,PON Test Function Issue,2026-04-29
+PN547,Get BOSA TX DDMI Fail,PON Test Function Issue,2026-04-29
+PN548,Check BOSA TX Power Too High,PON Test Function Issue,2026-04-29
+PN549,Check BOSA TX Power Too Low,PON Test Function Issue,2026-04-29
+PN550,Set BOSA Init Power Fail,Unknown,2026-04-29
+PN551,Set BOSA Ibias Fail,PON Test Function Issue,2026-04-29
+PN552,Set BOSA Eye Diagram Switch Fail,PON Test Function Issue,2026-04-29
+PN600     Initialize Calibration Process Fail,,Unknown,2026-04-29
+PN601     APD Calibration Fail,,Unknown,2026-04-29
+PN602     Open Loop Calibration Fail,,Unknown,2026-04-29
+PN603     MPD Channel Calibration Fail,,Unknown,2026-04-29
+PN604     DCD Calibration Fail,,Unknown,2026-04-29
+PN605     tracking cal tracking targets Fail,,Unknown,2026-04-29
+PN606     Average optical power calibration Fail,,Unknown,2026-04-29
+PN608     First Burst Targets Calibration Fail,,Unknown,2026-04-29
+PN609     Eye Safety Threshold Validation Fail,,Unknown,2026-04-29
+PN610     Rogue Threshold Validation Fail,,Unknown,2026-04-29
+PN611     RSSI Calibration Fail,,PON Test Function Issue,2026-04-29
+PN612     RSSI-LOS Calibration Fail,,PON Test Function Issue,2026-04-29
+PN614     Program Calibration Data Fail,,PON Test Function Issue,2026-04-29
+PN615     BRCM PON Solution Verify TX Power Fail,,PON Test Function Issue,2026-04-29
+PN616     BRCM PON Solution Verify RX Power Fail,,PON Test Function Issue,2026-04-29
+PN617     BRCM PON Solution Verify RX SEN Fail,,PON Test Function Issue,2026-04-29
+PN618     Put PMD firmware in calibration mode Fail,,PON Test Function Issue,2026-04-29
+PN619     Remove PMD calibration files from flash Fail,,PON Test Function Issue,2026-04-29
+PN621     Bias Optical Power Calibration Fail,,PON Test Function Issue,2026-04-29
+PN622     Modulation Optical Power Calibration Fail,,PON Test Function Issue,2026-04-29
+PN623     Check Calibration Data Fail,,PON Test Function Issue,2026-04-29
+PN624     PON throughput larger than link rate,,PON Test Function Issue,2026-04-29
+PN625     Python Calibration Fail,,PON Test Function Issue,2026-04-29
+PN700     XGPON RX SEN PRBS23 Test Fail,,Unknown,2026-04-29
+PN701     XGPON Init and connect to Test Equipment Fail,,Unknown,2026-04-29
+PN702     XGPON TX Calibration Test Fail,,Unknown,2026-04-29
+PN703     XGPON RX Calibration Test Fail,,Unknown,2026-04-29
+PN704     XGPON TX Calibration Exception Fail,,Unknown,2026-04-29
+PN705     XGPON RX Calibration Exception Fail,,Unknown,2026-04-29
+PN706     XGPON Read Power Measurements From OPM Fail,,Unknown,2026-04-29
+PN707     XGPON Generate and Write APD LUT Fail,,Unknown,2026-04-29
+PN708     XGPON RX Calibration Set Attenuator Fail,,Unknown,2026-04-29
+PN709     XGPON Check TX DDMI too Hight Fail,,Unknown,2026-04-29
+PN710     XGPON Check TX DDMI too Low Fail,,Unknown,2026-04-29
+PN711     XGPON Check RX DDMI too Hight Fail,,PON Test Function Issue,2026-04-29
+PN712     XGPON Check RX DDMI too Low Fail,,PON Test Function Issue,2026-04-29
+PN713     XGPON Extinction Ratio Calibration Exception,,PON Test Function Issue,2026-04-29
+PN714     XGPON Check DDMI Get Data Fail,,PON Test Function Issue,2026-04-29
+PN715     XGPON Set the EYE Diagram Measured Port Fail,,PON Test Function Issue,2026-04-29
+PN716     XGPON Extinction Ratio Calibration Tune ER,,PON Test Function Issue,2026-04-29
+PN717     XGPON Extinction Ratio Calibration Check,,PON Test Function Issue,2026-04-29
+PN718     XGPON Extinction Ratio Calibration Check,,PON Test Function Issue,2026-04-29
+PN719     XGPON Extinction Ratio Calibration Check Point,,PON Test Function Issue,2026-04-29
+PN720     XGPON Extinction Ratio Calibration Check Mask,,Unknown,2026-04-29
+PN721     XGPON Measuring and Check TXPOW with,,PON Test Function Issue,2026-04-29
+PN722     XGPON Measuring and Check TXPOW with,,PON Test Function Issue,2026-04-29
+PN723     XGPON Measuring and Check RXPOW with,,PON Test Function Issue,2026-04-29
+PN724     XGPON Measuring and Check RXPOW with,,PON Test Function Issue,2026-04-29
+PN725     XGPON Check TX Power Fail,,PON Test Function Issue,2026-04-29
+PN726     XGPON Check RX Power Fail,,PON Test Function Issue,2026-04-29
+PN727     XGPON Check connection Status between ONU,,PON Test Function Issue,2026-04-29
+PN751     Init and connect to Test Equipment Fail,,PON Test Function Issue,2026-04-29
+PN752     Extinction Ratio Calibration Fail,,PON Test Function Issue,2026-04-29
+PN753     Transmit Output Power Tuning Fail,,PON Test Function Issue,2026-04-29
+PN754     Extinction Ratio Calibration Tune ER Fail,,PON Test Function Issue,2026-04-29
+PN755     Extinction Ratio Calibration Check Point to Point,,PON Test Function Issue,2026-04-29
+PN756     Extinction Ratio Calibration Check Mask Margin,,PON Test Function Issue,2026-04-29
+PN757     Query BOSA Data From DataBase Fail,,PON Test Function Issue,2026-04-29
+PN758     Estimate DAC Value Fail,,PON Test Function Issue,2026-04-29
+"PN759     Check table 4 0x98, 0x99 Fail",,Unknown,2026-04-29
+PN760     Enable Prbs23 Fail,,Unknown,2026-04-29
+PN761     Set Support Volt=3.3V Fail,,PON Test Function Issue,2026-04-29
+PN762     Set TX power slop and offset Fail,,PON Test Function Issue,2026-04-29
+PN763     Load Calibration init data Fail,,PON Test Function Issue,2026-04-29
+PN764     Check Bias Current Fail,,PON Test Function Issue,2026-04-29
+PN765     RX SEN PRBS23 Test Fail,,PON Test Function Issue,2026-04-29
+PN766     Back Up Calibration Data Fail,,PON Test Function Issue,2026-04-29
+PN767     Check RX DDMI too Hight at -29 dBm Fail,,PON Test Function Issue,2026-04-29
+PN768     Check RX DDMI too Low at -29 dBm Fail,,PON Test Function Issue,2026-04-29
+PN769     Check RX DDMI too Hight at -25 dBm Fail,,PON Test Function Issue,2026-04-29
+PN770     Check RX DDMI too Low at -25 dBm Fail,,Unknown,2026-04-29
+PN771     Check RX DDMI too Hight at -15 dBm Fail,,PON Test Function Issue,2026-04-29
+PN772     Check RX DDMI too Low at -15 dBm Fail,,PON Test Function Issue,2026-04-29
+PN773     Check RX Board Data Fail,,PON Test Function Issue,2026-04-29
+PN774     Load Initial File Fail,,PON Test Function Issue,2026-04-29
+PN775     Check Link status Fail,,PON Test Function Issue,2026-04-29
+PN776     Check DDMI Temperature (too Low) Fail,,PON Test Function Issue,2026-04-29
+PN777     Check DDMI Temperature (too High) Fail,,PON Test Function Issue,2026-04-29
+PN778     Check BOSA Data Fail,,PON Test Function Issue,2026-04-29
+PN779     Check DDMI Transmit Power (too Low) Fail,,PON Test Function Issue,2026-04-29
+PN780     Check DDMI Transmit Power (too High) Fail,,Unknown,2026-04-29
+PN781     Check DDMI Receive Power (too Low) Fail,,PON Test Function Issue,2026-04-29
+PN782     Check DDMI Receive Power (too High) Fail,,PON Test Function Issue,2026-04-29
+PN783     Check Transmit Output Power Fail,,PON Test Function Issue,2026-04-29
+PN784     Extinction Ratio Calibration Check Crossing Fail,,PON Test Function Issue,2026-04-29
+PN785     Check Register Fail,,PON Test Function Issue,2026-04-29
+PN786     Check RX DDMI RX Power Fail,,PON Test Function Issue,2026-04-29
+PL001,Zero Cross Fail,Power Line Test Function Issue,2026-04-29
+PL002,Burn Micro Code Fail,Power Line Test Function Issue,2026-04-29
+PL003,Check Power Saving Mode Fail,Power Line Test Function Issue,2026-04-29
+FM001,Initial Frequency Calibration Fail,Femtocell Test Function Issue,2026-04-29
+FM002,TX Power Calibration Fail,Femtocell Test Function Issue,2026-04-29
+FM003,RX RSSI Calibration Fail,Femtocell Test Function Issue,2026-04-29
+FM004,TX Frequency Fail,Femtocell Test Function Issue,2026-04-29
+FM005,Tx Power Step Fail,Femtocell Test Function Issue,2026-04-29
+FM006,TX RHO Fail,Femtocell Test Function Issue,2026-04-29
+FM007,TX ACP Fail,Femtocell Test Function Issue,2026-04-29
+FM008,TX SEM Fail,Femtocell Test Function Issue,2026-04-29
+FM009,RX RSSI Fail,Femtocell Test Function Issue,2026-04-29
+FM010,RX BLER Fail,Femtocell Test Function Issue,2026-04-29
+FM011,RX Sensitivity Fail,Femtocell Test Function Issue,2026-04-29
+FM012,N7309A1 program init Fail,Femtocell Test Function Issue,2026-04-29
+FM013,Agilent MXA init Fail,Femtocell Test Function Issue,2026-04-29
+FM014,Agilent ESG init Fail,Femtocell Test Function Issue,2026-04-29
+FM015,RF Test Timeout,Femtocell Test Function Issue,2026-04-29
+FM016,OTP1 MAC addr programmming Fail,Femtocell Test Function Issue,2026-04-29
+FM017,Telnet connection to DUT Fail,Femtocell Test Function Issue,2026-04-29
+FM018,Update kernal Fail,Femtocell Test Function Issue,2026-04-29
+FM019,Update rfs Fail,Femtocell Test Function Issue,2026-04-29
+FM020,Update app Fail,Femtocell Test Function Issue,2026-04-29
+FM021,Update unitdata Fail,Femtocell Test Function Issue,2026-04-29
+FM022,Update caldata Fail,Femtocell Test Function Issue,2026-04-29
+FM023,SCP connection to DUT Fail,Femtocell Test Function Issue,2026-04-29
+FM024,Can't find correct unitdata,Femtocell Test Function Issue,2026-04-29
+LT001,,LTE Test Function Issue,2026-04-29
+LT002,,LTE Test Function Issue,2026-04-29
+LT003,,LTE Test Function Issue,2026-04-29
+LT004,,LTE Test Function Issue,2026-04-29
+LT005,,LTE Test Function Issue,2026-04-29
+LT006,,LTE Test Function Issue,2026-04-29
+LT007,,LTE Test Function Issue,2026-04-29
+LT008,,LTE Test Function Issue,2026-04-29
+LT009,,LTE Test Function Issue,2026-04-29
+LT010,,LTE Test Function Issue,2026-04-29
+LT011,,LTE Test Function Issue,2026-04-29
+LT012,,LTE Test Function Issue,2026-04-29
+LT013,,LTE Test Function Issue,2026-04-29
+LT014,,LTE Test Function Issue,2026-04-29
+LT015,,LTE Test Function Issue,2026-04-29
+LT016,,LTE Test Function Issue,2026-04-29
+LT017,,LTE Test Function Issue,2026-04-29
+LT018,,LTE Test Function Issue,2026-04-29
+LT019,,LTE Test Function Issue,2026-04-29
+LT020,,LTE Test Function Issue,2026-04-29
+LT021,,LTE Test Function Issue,2026-04-29
+LT022,,LTE Test Function Issue,2026-04-29
+LT023,,LTE Test Function Issue,2026-04-29
+LT024,,LTE Test Function Issue,2026-04-29
+LT025,,LTE Test Function Issue,2026-04-29
+LT026,,LTE Test Function Issue,2026-04-29
+LT027,,LTE Test Function Issue,2026-04-29
+LT028,,LTE Test Function Issue,2026-04-29
+LT029,,LTE Test Function Issue,2026-04-29
+LT030,,LTE Test Function Issue,2026-04-29
+LT031,,LTE Test Function Issue,2026-04-29
+LT032,,LTE Test Function Issue,2026-04-29
+LT033,,LTE Test Function Issue,2026-04-29
+LT034,,LTE Test Function Issue,2026-04-29
+LT035,,LTE Test Function Issue,2026-04-29
+LT036,,LTE Test Function Issue,2026-04-29
+LT037,,LTE Test Function Issue,2026-04-29
+LT038,,LTE Test Function Issue,2026-04-29
+LT039,,LTE Test Function Issue,2026-04-29
+LT040,,LTE Test Function Issue,2026-04-29
+LT041,,LTE Test Function Issue,2026-04-29
+LT042,,LTE Test Function Issue,2026-04-29
+LT043,,LTE Test Function Issue,2026-04-29
+LT044,,LTE Test Function Issue,2026-04-29
+LT045,,LTE Test Function Issue,2026-04-29
+LT046,,LTE Test Function Issue,2026-04-29
+LT047,,LTE Test Function Issue,2026-04-29
+LT048,,LTE Test Function Issue,2026-04-29
+LT049,,LTE Test Function Issue,2026-04-29
+LT050,,LTE Test Function Issue,2026-04-29
+LT051,,LTE Test Function Issue,2026-04-29
+LT052,,LTE Test Function Issue,2026-04-29
+LT053,,LTE Test Function Issue,2026-04-29
+LT054,,LTE Test Function Issue,2026-04-29
+LT055,,LTE Test Function Issue,2026-04-29
+LT056,,LTE Test Function Issue,2026-04-29
+LT057,,LTE Test Function Issue,2026-04-29
+LT058,,LTE Test Function Issue,2026-04-29
+LT059,,LTE Test Function Issue,2026-04-29
+LT060,,LTE Test Function Issue,2026-04-29
+LT061,,LTE Test Function Issue,2026-04-29
+LT062,,LTE Test Function Issue,2026-04-29
+LT063,,LTE Test Function Issue,2026-04-29
+LT064,,LTE Test Function Issue,2026-04-29
+LT065,,LTE Test Function Issue,2026-04-29
+LT066,,LTE Test Function Issue,2026-04-29
+LT067,,LTE Test Function Issue,2026-04-29
+LT068,,LTE Test Function Issue,2026-04-29
+LT069,,LTE Test Function Issue,2026-04-29
+LT070,,LTE Test Function Issue,2026-04-29
+LT071,,LTE Test Function Issue,2026-04-29
+LT072,,LTE Test Function Issue,2026-04-29
+LT073,,LTE Test Function Issue,2026-04-29
+LT074,,LTE Test Function Issue,2026-04-29
+LT075,,LTE Test Function Issue,2026-04-29
+LT076,,LTE Test Function Issue,2026-04-29
+LT077,,LTE Test Function Issue,2026-04-29
+LT078,,LTE Test Function Issue,2026-04-29
+LT079,,LTE Test Function Issue,2026-04-29
+LT080,,LTE Test Function Issue,2026-04-29
+LT081,,LTE Test Function Issue,2026-04-29
+LT082,,LTE Test Function Issue,2026-04-29
+LT083,,LTE Test Function Issue,2026-04-29
+LT084,,LTE Test Function Issue,2026-04-29
+GF001,Set Boot Parameters Fail,General Test Function Issue,2026-04-29
+GF002,CLI Command Fail,General Test Function Issue,2026-04-29
+GF003,Detect Wireless Card Fail,General Test Function Issue,2026-04-29
+GF004,Ping Fail,General Test Function Issue,2026-04-29
+GF005,LED Test Fail,General Test Function Issue,2026-04-29
+GF006,Reset Button Test Fail,General Test Function Issue,2026-04-29
+GF007,WLAN Button Test Fail,General Test Function Issue,2026-04-29
+GF008,WPS Button Test Fail,General Test Function Issue,2026-04-29
+GF009,LAN Port Test Fail,General Test Function Issue,2026-04-29
+GF010,USB Host Test Fail,General Test Function Issue,2026-04-29
+GF011,USB Slave Test Fail,General Test Function Issue,2026-04-29
+GF012,DOS Command Fail,General Test Function Issue,2026-04-29
+GF013,ART Command Fail,General Test Function Issue,2026-04-29
+GF014,Upload Test Image Fail,General Test Function Issue,2026-04-29
+GF015,TX Throughput Test Fail,General Test Function Issue,2026-04-29
+GF016,RX Throughput Test Fail,General Test Function Issue,2026-04-29
+GF017,Set SSID Fail,General Test Function Issue,2026-04-29
+GF018,Set Bridge Mode Fail,General Test Function Issue,2026-04-29
+GF019,Set PPPoE Mode Fail,General Test Function Issue,2026-04-29
+GF020,Disable Firewall Fail,General Test Function Issue,2026-04-29
+GF021,Set Security Fail,General Test Function Issue,2026-04-29
+GF022,Set To ADSL Mode Fail,General Test Function Issue,2026-04-29
+GF023,Set To VDSL Mode Fail,General Test Function Issue,2026-04-29
+GF024,Set To ISDN Mode Fail,General Test Function Issue,2026-04-29
+GF025,Set DUT IP Fail,General Test Function Issue,2026-04-29
+GF026,Set Country Fail,General Test Function Issue,2026-04-29
+GF027,Set SKU ID Fail,General Test Function Issue,2026-04-29
+GF028,Set WPS PIN ID Fail,General Test Function Issue,2026-04-29
+GF029,Set DUT To Default Fail,General Test Function Issue,2026-04-29
+GF030,Check Web Value Fail,General Test Function Issue,2026-04-29
+GF031,Check SKU ID Fail,General Test Function Issue,2026-04-29
+GF032,Check WPS PIN ID Fail,General Test Function Issue,2026-04-29
+GF033,Check DUT Default Fail,General Test Function Issue,2026-04-29
+GF034,Check Runtime Version Fail,General Test Function Issue,2026-04-29
+GF035,Check Mini-Kernel Fail,General Test Function Issue,2026-04-29
+GF036,Upgrade Boot Code Fail,General Test Function Issue,2026-04-29
+GF037,Upgrade Runtime Code Fail,General Test Function Issue,2026-04-29
+GF038,Upgrade Private Key Fail,General Test Function Issue,2026-04-29
+GF039,Upgrade Public Key Fail,General Test Function Issue,2026-04-29
+GF040,Throughput Test Fail,General Test Function Issue,2026-04-29
+GF041,Set Log Fail,General Test Function Issue,2026-04-29
+GF042,LCD Panel Test Fail,General Test Function Issue,2026-04-29
+GF043,Touch Pad Test Fail,General Test Function Issue,2026-04-29
+GF044,Board Configuration test Fail,General Test Function Issue,2026-04-29
+GF045,Memory Test Fail,General Test Function Issue,2026-04-29
+GF047,Check Boot Code Version Fail,General Test Function Issue,2026-04-29
+GF048,Set RSA Key Fail,General Test Function Issue,2026-04-29
+GF049,Check Program Information Fail,General Test Function Issue,2026-04-29
+GF050,Check Version det information Fail,General Test Function Issue,2026-04-29
+GF051,Power ON and Check AP Status Fail,General Test Function Issue,2026-04-29
+GF053,Check 2G Association test Fail,General Test Function Issue,2026-04-29
+GF054,Check 5G Association test Fail,General Test Function Issue,2026-04-29
+GF055,Get Sessions ID and Verify Client card IP Addr,General Test Function Issue,2026-04-29
+GF056,Disable Radio and Get show log buffer Fail,General Test Function Issue,2026-04-29
+GF057,DUT bootcode and Bootstrap version information,General Test Function Issue,2026-04-29
+GF058,Check 2G Client Card Info Fail,General Test Function Issue,2026-04-29
+GF059,Check 5G Client Card Info Fail,General Test Function Issue,2026-04-29
+GF060,Run ART2-CART Fail,General Test Function Issue,2026-04-29
+GF061,Wait ART2 Initialization Timeout,General Test Function Issue,2026-04-29
+GF062,ART2 Open Report file Fail,General Test Function Issue,2026-04-29
+GF063,ART2 2GHz Power Accuracy by chain Fail,General Test Function Issue,2026-04-29
+GF064,ART2 2GHz Power (EVM) Accuracy Fail,General Test Function Issue,2026-04-29
+GF065,ART2 2GHz EVM Accuracy Fail,General Test Function Issue,2026-04-29
+GF066,ART2 2GHz Frequency Accuracy Fail,General Test Function Issue,2026-04-29
+GF067,ART2 2GHz Spectral Mask Fail,General Test Function Issue,2026-04-29
+GF068,ART2 2GHz Sensitivity Fail,General Test Function Issue,2026-04-29
+GF069,ART2 Wait 2GHz Calibration Coefficients timeout,General Test Function Issue,2026-04-29
+GF070,ART2 Wait 2GHz EVM Accuracy timeout,General Test Function Issue,2026-04-29
+GF071,ART2 Wait 2GHz SPECTRAL MASK timeout,General Test Function Issue,2026-04-29
+GF072,ART2 Wait 2GHz RSSI Calibration timeout,General Test Function Issue,2026-04-29
+GF073,ART2 Wait 2GHZ SENSITIVITY timeout,General Test Function Issue,2026-04-29
+GF074,JUNP Set Model Name Fail,General Test Function Issue,2026-04-29
+GF075,JUNP Set Ethernet MAC Addr Fail,General Test Function Issue,2026-04-29
+GF076,JUNP Set Serial Number Fail,General Test Function Issue,2026-04-29
+GF077,JUNP Set RegionID Fail,General Test Function Issue,2026-04-29
+GF078,JUNP Set Number MAC Fail,General Test Function Issue,2026-04-29
+GF079,JUNP Set Harware Version Fail,General Test Function Issue,2026-04-29
+GF080,ART2 Wait 5GHz Calibration Coefficients,General Test Function Issue,2026-04-29
+GF081,ART2 5GHz Power Accuracy by chain Fail,General Test Function Issue,2026-04-29
+GF082,ART2 5GHz Power (EVM) Accuracy Fail,General Test Function Issue,2026-04-29
+GF083,ART2 5GHz Sensitivity Fail,General Test Function Issue,2026-04-29
+GF084,ART2 5GHz EVM Accuracy Fail,General Test Function Issue,2026-04-29
+GF085,ART2 5GHz Frequency Accuracy Fail,General Test Function Issue,2026-04-29
+GF086,ART2 write calibration value Fail,General Test Function Issue,2026-04-29
+GF087,ART2 Restore FLASH partition Fail,General Test Function Issue,2026-04-29
+GF088,ART2 Ping to IQF IP Fail,General Test Function Issue,2026-04-29
+GF089,ART2 Communication with IQF Fail,General Test Function Issue,2026-04-29
+GF090,JUNP Download uBoot Fail,General Test Function Issue,2026-04-29
+GF091,JUNP Set MFG Data Fail,General Test Function Issue,2026-04-29
+GF092,PCI-E Component Fail,General Test Function Issue,2026-04-29
+GF093,Device Reset Error,General Test Function Issue,2026-04-29
+GF094,SIM Card Test Fail,General Test Function Issue,2026-04-29
+GF095,External Loopback Test Fail,General Test Function Issue,2026-04-29
+GF096,Check Relay Board Status Fail,General Test Function Issue,2026-04-29
+GF097,Internal Loopback Test Fail,General Test Function Issue,2026-04-29
+GF098,Set 2G ClientCard Kill Iperf flag Fail,General Test Function Issue,2026-04-29
+GF099,Set 5G ClientCard Kill Iperf flag Fail,General Test Function Issue,2026-04-29
+GF100,Parsing Logfile Fail,Unknown,2026-04-29
+GF101,LAN Port 1 Test Fail,Unknown,2026-04-29
+GF102,LAN Port 2 Test Fail,Unknown,2026-04-29
+GF103,LAN Port 3 Test Fail,Unknown,2026-04-29
+GF104,LAN Port 4 Test Fail,Unknown,2026-04-29
+GF105,WAN Port Test Fail,Unknown,2026-04-29
+GF106,USB1 VIA Host Init Fail,Unknown,2026-04-29
+GF107,USB2 OTG Host Init Fail,Unknown,2026-04-29
+GF108,USB1 Detected Fail,Unknown,2026-04-29
+GF109,USB2 Detected Fail,Unknown,2026-04-29
+GF110,POST Fail,Unknown,2026-04-29
+GF111,Restart Button Test Fail,General Test Function Issue,2026-04-29
+GF112,Roter Button Test Fail,General Test Function Issue,2026-04-29
+GF113,USB Ejection Button Test Fail,General Test Function Issue,2026-04-29
+GF114,Device Initial Fail,General Test Function Issue,2026-04-29
+GF115,Web Password Fail,General Test Function Issue,2026-04-29
+GF116,Write Parameters Fail,General Test Function Issue,2026-04-29
+GF117,Write Parameters Timeout,General Test Function Issue,2026-04-29
+GF118,Check Parameters Timeout,General Test Function Issue,2026-04-29
+GF119,DUT Power Consumption Check Fail,General Test Function Issue,2026-04-29
+GF120,Load Customer Code Fail,Unknown,2026-04-29
+GF121,Check Telnet Status Fail,General Test Function Issue,2026-04-29
+GF122,UART Test Fail,General Test Function Issue,2026-04-29
+GF123,Telnet Login Fail,General Test Function Issue,2026-04-29
+GF124,Check Work Order Fail,General Test Function Issue,2026-04-29
+GF125,Set Regulation Domain Fail,General Test Function Issue,2026-04-29
+GF126,Check Regulation Domain Fail,General Test Function Issue,2026-04-29
+GF127,Set Regrev Fail,General Test Function Issue,2026-04-29
+GF128,Check Regrev Fail,General Test Function Issue,2026-04-29
+GF129,Check Part Number Fail,General Test Function Issue,2026-04-29
+GF130,Switch Test Fail,Unknown,2026-04-29
+GF131,Get Board Parameters Fail,General Test Function Issue,2026-04-29
+GF132,Can,General Test Function Issue,2026-04-29
+GF133,Loading Image Check Fail,General Test Function Issue,2026-04-29
+GF134,Write Protection Fail,General Test Function Issue,2026-04-29
+GF135,Ping Dut Until Offline Fail,General Test Function Issue,2026-04-29
+GF136,Enable Device Fail,General Test Function Issue,2026-04-29
+GF137,Disable Device Fail,General Test Function Issue,2026-04-29
+GF138,DDR RAM Self Test Fail,General Test Function Issue,2026-04-29
+GF139,Reset DUT,General Test Function Issue,2026-04-29
+GF140,Remove DUT Fail,Unknown,2026-04-29
+GF141,Kill SW Process Fail,General Test Function Issue,2026-04-29
+GF142,Software Rebooting Fail,General Test Function Issue,2026-04-29
+GF143,Generate Username and Password Fail,General Test Function Issue,2026-04-29
+GF144,WebUI Login Fail,General Test Function Issue,2026-04-29
+GF145,Check PSK Fail,General Test Function Issue,2026-04-29
+GF146,Check PWDPSK Fail,General Test Function Issue,2026-04-29
+GF147,LED Button Test Fail,General Test Function Issue,2026-04-29
+GF148,Check SSL Fail,General Test Function Issue,2026-04-29
+GF149,Detect HardDisk Fail,General Test Function Issue,2026-04-29
+GF150,Set RTC Time Fail,Unknown,2026-04-29
+GF151,Check RTC Time Fail,General Test Function Issue,2026-04-29
+GF152,Check FTTH Mode Fail,General Test Function Issue,2026-04-29
+GF153,Rework to MFG Mode Fail,General Test Function Issue,2026-04-29
+GF154,Power Module Test Fail,General Test Function Issue,2026-04-29
+GF155,GPIO Test Fail,General Test Function Issue,2026-04-29
+GF156,LCD Test Fail,General Test Function Issue,2026-04-29
+GF157,Nand Flash Test Fail,General Test Function Issue,2026-04-29
+GF158,SPI Flash Test Fail,General Test Function Issue,2026-04-29
+GF159,I2C Test Fail,General Test Function Issue,2026-04-29
+GF160,Loop Back Test Fail,Unknown,2026-04-29
+GF161,I2C Voltage Test Fail,General Test Function Issue,2026-04-29
+GF162,Set WLAN ON Fail,General Test Function Issue,2026-04-29
+GF163,Load ART2 File Fail,General Test Function Issue,2026-04-29
+GF164,Check Pwmon Fail,General Test Function Issue,2026-04-29
+GF165,Check CPU Frequency Fail,General Test Function Issue,2026-04-29
+GF166,LAN Test T1 & T2 Port Test Fail,General Test Function Issue,2026-04-29
+GF167,Set WLAN OFF Fail,General Test Function Issue,2026-04-29
+GF168,Initialize ART Partition Fail,General Test Function Issue,2026-04-29
+GF169,Lock CPU Pin Fail,General Test Function Issue,2026-04-29
+GF170,Check Dut Current Fail,Unknown,2026-04-29
+GF171,USB 3.0 Port Detected 2.0 Device Fail,General Test Function Issue,2026-04-29
+GF172,USB 3.0 Port Detected 3.0 Device Fail,General Test Function Issue,2026-04-29
+GF173,ART2 5GHz Spectral Mask Fail,General Test Function Issue,2026-04-29
+GF174,Download Test Image Fail,General Test Function Issue,2026-04-29
+GF175,USB 2.0 Test Fail,General Test Function Issue,2026-04-29
+GF176,USB 3.0 Test Fail,General Test Function Issue,2026-04-29
+GF177,Ping FTP Server Fail,General Test Function Issue,2026-04-29
+GF178,Get file from FTP Server Fail,General Test Function Issue,2026-04-29
+GF179,Get MAC from File Fail,General Test Function Issue,2026-04-29
+GF180,Set SSL ID Fail,Unknown,2026-04-29
+GF181,Check security File Fail,General Test Function Issue,2026-04-29
+GF182,Check Security FW Image Fail,General Test Function Issue,2026-04-29
+GF183,Parse data from SFIS Fail,General Test Function Issue,2026-04-29
+GF184,Check Parameters Fail,General Test Function Issue,2026-04-29
+GF185,Write Certificate Files Fail,General Test Function Issue,2026-04-29
+GF186,Noise Floor Cal Fail,General Test Function Issue,2026-04-29
+GF187,Write Cap Values to Memory Fail,General Test Function Issue,2026-04-29
+GF188,Program Cap Values to OTP Fail,General Test Function Issue,2026-04-29
+GF189,Check Certificate Files Fail,General Test Function Issue,2026-04-29
+GF190,Temperature Test Fail,Unknown,2026-04-29
+GF191,Spur Test Fail,General Test Function Issue,2026-04-29
+GF192     Set WiFi Up Fail,,General Test Function Issue,2026-04-29
+GF193     Set WiFi Down Fail,,General Test Function Issue,2026-04-29
+GF194     Set ART Stop Fail,,General Test Function Issue,2026-04-29
+GF195     Update Target Power Fail,,General Test Function Issue,2026-04-29
+GF196     Set FT Program Version Fail,,General Test Function Issue,2026-04-29
+GF197     Local PHY Status Fail,,General Test Function Issue,2026-04-29
+GF198,SDIO Test Fail,General Test Function Issue,2026-04-29
+GF199     Check art Mode Fail,,General Test Function Issue,2026-04-29
+GF200,Check test Mode Fail,Unknown,2026-04-29
+GF201     Check FT Program Version Fail,,Unknown,2026-04-29
+GF202     Init test Mode Fail,,Unknown,2026-04-29
+GF203     HW Switch Button Up Fail,,Unknown,2026-04-29
+GF204     HW Switch Button Down Fail,,Unknown,2026-04-29
+GF205     HW Switch Button Left Fail,,Unknown,2026-04-29
+GF206     HW Switch Button Right Fail,,Unknown,2026-04-29
+GF207     HW Switch Button Enter Fail,,Unknown,2026-04-29
+GF208     Find CA File Fail,,Unknown,2026-04-29
+GF209     Copy CA File Fail,,Unknown,2026-04-29
+GF210     Write CA File Fail,,Unknown,2026-04-29
+GF211     Init Audio Loopback Mode Fail,,General Test Function Issue,2026-04-29
+GF212     Audio Test Fail,,General Test Function Issue,2026-04-29
+GF213     IR TX Test Fail,,General Test Function Issue,2026-04-29
+GF214     IR RX Test Fail,,General Test Function Issue,2026-04-29
+GF215     Audio Record Test Fail,,General Test Function Issue,2026-04-29
+GF216     Audio Play Test Fail,,General Test Function Issue,2026-04-29
+GF217     Audio Analysis THD+N Fail,,General Test Function Issue,2026-04-29
+GF218     Audio Analysis Power Fail,,General Test Function Issue,2026-04-29
+GF219     Audio Analysis Output Level Fail,,General Test Function Issue,2026-04-29
+GF220     Audio Record File Found Fail,,Unknown,2026-04-29
+GF221     Update Cal File Fail,,General Test Function Issue,2026-04-29
+GF222     Set PT Program Version Fail,,General Test Function Issue,2026-04-29
+GF223     Check PT Program Version Fail,,General Test Function Issue,2026-04-29
+GF224     Set RF Board BOM Version Fail,,General Test Function Issue,2026-04-29
+GF225     Check RF Board BOM Version Fail,,General Test Function Issue,2026-04-29
+GF226     Set Mechanical BOM Version Fail,,General Test Function Issue,2026-04-29
+GF227     Check Mechanical BOM Version Fail,,General Test Function Issue,2026-04-29
+GF228     Set Mechanical SOP Version Fail,,General Test Function Issue,2026-04-29
+GF229     Check Mechanical SOP Version Fail,,General Test Function Issue,2026-04-29
+GF230,Check Wifi Chip Fail,Unknown,2026-04-29
+GF231,Get IP From DHCP Server Fail,General Test Function Issue,2026-04-29
+GF232     Set GFAST Mode Fail,,General Test Function Issue,2026-04-29
+GF233     Check ECC Correction Count Fail,,General Test Function Issue,2026-04-29
+GF234,TPM Init Fail,General Test Function Issue,2026-04-29
+GF235,TPM Enable Fail,General Test Function Issue,2026-04-29
+GF236,Check SN Fail,General Test Function Issue,2026-04-29
+GF237,Set Model Name fail,General Test Function Issue,2026-04-29
+GF238,Check Model Name fail,General Test Function Issue,2026-04-29
+GF239,Set Speaker version fail,General Test Function Issue,2026-04-29
+GF240,Check Speaker version fail,Unknown,2026-04-29
+GF241,Check SSID fail,General Test Function Issue,2026-04-29
+GF242,Open/short test fail,General Test Function Issue,2026-04-29
+GF243,Set HwId fail,General Test Function Issue,2026-04-29
+GF244,Check HwId fail,General Test Function Issue,2026-04-29
+GF245,Set HwVersion fail,General Test Function Issue,2026-04-29
+GF246,Check HwVersion fail,General Test Function Issue,2026-04-29
+GF247,Set HwBom fail,General Test Function Issue,2026-04-29
+GF248,Checkk HwBom fail,General Test Function Issue,2026-04-29
+GF249,Set DataCode fail,General Test Function Issue,2026-04-29
+GF250,Set AuthKey fail,Unknown,2026-04-29
+GF251,Check AuthKey fail,General Test Function Issue,2026-04-29
+GF252,Check WiFi Board Connection Fail,General Test Function Issue,2026-04-29
+GF253,Secure Boot Enable Fail,General Test Function Issue,2026-04-29
+GF254,Reboot Button Test Fail,General Test Function Issue,2026-04-29
+GF255,Display Button Test Fail,General Test Function Issue,2026-04-29
+GF257     Generate Board Data Fail,,General Test Function Issue,2026-04-29
+GF260,Check Firmware Version Fail,Unknown,2026-04-29
+GF280     Upgrade Firmware Fail,,Unknown,2026-04-29
+GF281,MDIO Test Fail,General Test Function Issue,2026-04-29
+GF282,Micro Chip Test Fail,General Test Function Issue,2026-04-29
+GF283,NXP Driver Test Fail,General Test Function Issue,2026-04-29
+GF284,USB-C Voltage Test Fail,General Test Function Issue,2026-04-29
+GF285,Ping Custom IP Fail,General Test Function Issue,2026-04-29
+GF286,Flash Read Write Test Fail,General Test Function Issue,2026-04-29
+GF287,Buzzer Test Fail,General Test Function Issue,2026-04-29
+GF289,DDR Ram ID Check Fail,General Test Function Issue,2026-04-29
+GF290,eMMC Rom ID Check Fail,Unknown,2026-04-29
+EN001,Set COM Port Fail,Environment Issue,2026-04-29
+EN002,Golden Unavailable,Environment Issue,2026-04-29
+EN003,Get Network Interface Fail,Environment Issue,2026-04-29
+EN004,Check Routing Table Fail,Environment Issue,2026-04-29
+EN005,The Console Controller Not Response,Environment Issue,2026-04-29
+EN006,Generate UUID Fail,Environment Issue,2026-04-29
+EN007,Label and DUT SN Doesn't Match,Environment Issue,2026-04-29
+EN008,Get SN Fail,Environment Issue,2026-04-29
+EN009,Instrument and Fixture Init Fail,Environment Issue,2026-04-29
+SF001,,SFIS Issue,2026-04-29
+SF002,,SFIS Issue,2026-04-29
+SF003,,SFIS Issue,2026-04-29
+SF004,,SFIS Issue,2026-04-29
+BN001,Controller Configure Fail,Burn-in Issue,2026-04-29
+BN002,PoE Switch Configure Fail,Burn-in Issue,2026-04-29
+BN003,Software rebooting Fail,Burn-in Issue,2026-04-29
+BN004,Hardware rebooting Fail,Burn-in Issue,2026-04-29
+BN005,Ping to 2.4G Client Card Fail,Burn-in Issue,2026-04-29
+BN006,Ping to 5G Client Card Fail,Burn-in Issue,2026-04-29
+BN007,Ping to LAN Client Card Fail,Burn-in Issue,2026-04-29
+BN008,Ping to 5G and LAN Fail,Burn-in Issue,2026-04-29
+BN009,Ping to 2G and LAN Fail,Burn-in Issue,2026-04-29
+BN010,Ping to 2G and 5G Client Card Fail,Burn-in Issue,2026-04-29
+BN011,Ping to 2G and 5G and LAN Fail,Burn-in Issue,2026-04-29
+BN012,Hardware rebooting and Ping LAN Fail,Burn-in Issue,2026-04-29
+BN013,Hardware rebooting and Ping to 5G Client Card,Burn-in Issue,2026-04-29
+BN014,Hardware rebooting and Ping to 5G and LAN Fail,Burn-in Issue,2026-04-29
+BN015,Hardware rebooting and Ping to 2G Client Card,Burn-in Issue,2026-04-29
+BN016,Hardware rebooting and Ping to 2G and LAN Fail,Burn-in Issue,2026-04-29
+BN017,Hardware rebooting and Ping to 2G and 5G Fail,Burn-in Issue,2026-04-29
+BN018,Hardware rebooting and Ping to 2G and 5G and,Burn-in Issue,2026-04-29
+BN019,Software rebooting and Ping to LAN Fail,Burn-in Issue,2026-04-29
+BN020,Software rebooting and Ping to 5G Fail,Burn-in Issue,2026-04-29
+BN021,Software rebooting and Ping to 5G and LAN Fail,Burn-in Issue,2026-04-29
+BN022,Software rebooting and Ping to 2G Fail,Burn-in Issue,2026-04-29
+BN023,Software rebooting and Ping to 2G and LAN Fail,Burn-in Issue,2026-04-29
+BN024,Software rebooting and Ping to 2G and 5G Fail,Burn-in Issue,2026-04-29
+BN025,Software rebooting and Ping to 2G and 5G and,Burn-in Issue,2026-04-29
+BN026,Software rebooting and Hardware rebooting Fail,Burn-in Issue,2026-04-29
+BN027,Software and Hardware rebooting and Ping to 5G,Burn-in Issue,2026-04-29
+BN028,Software and Hardware rebooting and Ping to,Burn-in Issue,2026-04-29
+BN029,Software and Hardware rebooting and Ping to 5G,Burn-in Issue,2026-04-29
+BN030,Software and Hardware rebooting and Ping to 5G,Burn-in Issue,2026-04-29
+BN031,Software and Hardware rebooting and Ping to 2G,Burn-in Issue,2026-04-29
+BN032,Software and Hardware rebooting and Ping to 2G,Burn-in Issue,2026-04-29
+BN033,Software and Hardware rebooting and Ping to 2G,Burn-in Issue,2026-04-29
+BN034,Software and Hardware rebooting and Ping to 2G,Burn-in Issue,2026-04-29
+BN035,Check Agingtest Result Fail,Burn-in Issue,2026-04-29
+CC001,NFC Card Init Fail,NFC Card Issue,2026-04-29
+CC002,Write NFC Card Data Fail,NFC Card Issue,2026-04-29
+CC003,Check NFC Card Data Fail,NFC Card Issue,2026-04-29
+AP001,Execute Application Fail,Test Related Application Issue,2026-04-29
+AP002,Can't Start Iperf Server,Test Related Application Issue,2026-04-29
+AP003,Set Comport control to Golden Test PC,Test Related Application Issue,2026-04-29
+AP004,Can't disconnect from Golden,Test Related Application Issue,2026-04-29
+AP005,Start Iperf Error,Test Related Application Issue,2026-04-29
+AP006,Iperf Test Timeout,Test Related Application Issue,2026-04-29
+AP007,Get RSSI Timeout,Test Related Application Issue,2026-04-29
+AP008,Can't Set Comport to communicate with Golden,Test Related Application Issue,2026-04-29
+AP009,Can't Set Iperf Server IP to golden Test PC,Test Related Application Issue,2026-04-29
+AP010,Can't Set Iperf Client IP to golden Test PC,Test Related Application Issue,2026-04-29
+AP011,Can't Set IPerf server command to golden Test PC,Test Related Application Issue,2026-04-29
+AP012,Throughput Golden Server is Not Ready,Test Related Application Issue,2026-04-29
+AP013,Can't Get Golden Server Information,Test Related Application Issue,2026-04-29
+ZB001     Burn Node test Firmware Fail,,Zigbee Test Function Issue,2026-04-29
+ZB002     Burn Zigbee token gruop parameter Fail,,Zigbee Test Function Issue,2026-04-29
+ZB003     Burn ZCP Firmware Fail,,Zigbee Test Function Issue,2026-04-29
+ZB004     TX EVM Fail,,Zigbee Test Function Issue,2026-04-29
+ZB005     TX EVM-OFFSET Fail,,Zigbee Test Function Issue,2026-04-29
+ZB006     TX Freq Error Fail,,Zigbee Test Function Issue,2026-04-29
+ZB007     TX Symbol Clock Error Fail,,Zigbee Test Function Issue,2026-04-29
+ZB009     TX Power Fail,,Zigbee Test Function Issue,2026-04-29
+ZB010     TX Spectrum Mask Fail,,Zigbee Test Function Issue,2026-04-29
+ZB011     RX PER Fail,,Zigbee Test Function Issue,2026-04-29
+ZB012     RX RSSI Fail,,Zigbee Test Function Issue,2026-04-29
+ZB013     Zigbee Enable Test Fail,,Zigbee Test Function Issue,2026-04-29
+ZB014     Zigbee Host Form Test Fail,,Zigbee Test Function Issue,2026-04-29
+ZB015     Zigbee Client Join Test Fail,,Zigbee Test Function Issue,2026-04-29
+ZB016     Zigbee Host Discover Test Fail,,Zigbee Test Function Issue,2026-04-29
+ZB017     Zigbee Client Leave Test Fail,,Zigbee Test Function Issue,2026-04-29
+ZB018,Check Zigbee Golden Status Fail,Zigbee Test Function Issue,2026-04-29
+ZB019,Check Zigbee DUT Status Fail,Zigbee Test Function Issue,2026-04-29
+ZB020,Zigbee Golden Telnet login Fail,Zigbee Test Function Issue,2026-04-29
+ZB021,Zigbee DUT Telnet login Fail,Zigbee Test Function Issue,2026-04-29
+ZB022,Zigbee RSSI Test Fail,Zigbee Test Function Issue,2026-04-29
+AT001,Audio test fail,Audio Test Function Issue,2026-04-29
+AT002,Mic compare test fail,Audio Test Function Issue,2026-04-29
+AT003,Mic Frequency response test fail,Audio Test Function Issue,2026-04-29
+AT004,Mic THD test fail,Audio Test Function Issue,2026-04-29
+AT005,Speaker SPL test fail,Audio Test Function Issue,2026-04-29
+AT006,Speaker THD test fail,Audio Test Function Issue,2026-04-29
+AT007,Speaker R&B test fail,Audio Test Function Issue,2026-04-29
+AT008,Audio Tester Initial Fail,Audio Test Function Issue,2026-04-29
+AT009,Status of audio Tester incorrect,Audio Test Function Issue,2026-04-29
+AT010,Mic Seal_Delta test fail,Audio Test Function Issue,2026-04-29
+AT011,Internal Sealing test fail,Audio Test Function Issue,2026-04-29
+AT012,Phonejack SPL fail,Audio Test Function Issue,2026-04-29
+AT013,Phonejack THD fail,Audio Test Function Issue,2026-04-29
+AT014,Phonejack R&B fail,Audio Test Function Issue,2026-04-29
+MC001,MoCA Power Level Test Fail,MoCA Test Function Issue,2026-04-29
+MC002,S11 Return Loss Test Fail,MoCA Test Function Issue,2026-04-29
+MC003,MoCA Throughput Test Fail,MoCA Test Function Issue,2026-04-29
+MC004,MoCA TX Throughput Test Fail,MoCA Test Function Issue,2026-04-29
+MC005,MoCA RX Throughput Test Fail,MoCA Test Function Issue,2026-04-29
+MC006,Check MoCA Board Connection Fail,MoCA Test Function Issue,2026-04-29
+MC008,MoCA WAN Frequency Accuracy Test Fail,MoCA Test Function Issue,2026-04-29
+MC009,MoCA LAN Frequency Accuracy Test Fail,MoCA Test Function Issue,2026-04-29
+MC010,MoCA WAN PHY Rate Test Fail,MoCA Test Function Issue,2026-04-29
+MC011,MoCA LAN PHY Rate Test Fail,MoCA Test Function Issue,2026-04-29
+MC012,MoCA WAN Return Loss Test Fail,MoCA Test Function Issue,2026-04-29
+MC013,MoCA LAN Return Loss Test Fail,MoCA Test Function Issue,2026-04-29
+MC014,MoCA WAN TX Power Test Fail,MoCA Test Function Issue,2026-04-29
+MC015,MoCA LAN TX Power Test Fail,MoCA Test Function Issue,2026-04-29
+MC016,MoCA WAN TX Throughput Test Fail,MoCA Test Function Issue,2026-04-29
+MC017,MoCA WAN RX Throughput Test Fail,MoCA Test Function Issue,2026-04-29
+MC018,MoCA LAN TX Throughput Test Fail,MoCA Test Function Issue,2026-04-29
+MC019,MoCA LAN RX Throughput Test Fail,MoCA Test Function Issue,2026-04-29
+MC020,Set MoCA LAN parameter Test Fail,MoCA Test Function Issue,2026-04-29
+MC021,Set MoCA WAN parameter Test Fail,MoCA Test Function Issue,2026-04-29
+ZW001,Burn Calibration FW Test Fail,Z-Wave Test Function Issue,2026-04-29
+ZW002,Burn RF Link Test FW Fail,Z-Wave Test Function Issue,2026-04-29
+ZW003,Burn Normal FW Fail,Z-Wave Test Function Issue,2026-04-29
+ZW004,Z-Wave TX Test Fail,Z-Wave Test Function Issue,2026-04-29
+ZW005,Z-Wave RX Test Fail,Z-Wave Test Function Issue,2026-04-29
+ZW006,Z-Wave RSSI Test Fail,Z-Wave Test Function Issue,2026-04-29
+ZW007,Z-Wave Self Calibration Test Fail,Z-Wave Test Function Issue,2026-04-29
+ZW008,Check Z-Wave Golden Status Fail,Z-Wave Test Function Issue,2026-04-29
+ZW009,Check Z-Wave DUT Status Fail,Z-Wave Test Function Issue,2026-04-29
+ZW010,Z-Wave Golden Telnet login Fail,Z-Wave Test Function Issue,2026-04-29
+ZW011,Z-Wave DUT Telnet login Fail,Z-Wave Test Function Issue,2026-04-29
