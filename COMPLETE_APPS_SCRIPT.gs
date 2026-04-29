@@ -36,6 +36,10 @@ function doGet(e) {
         return getCategories();
       case 'getStats':
         return getStats();
+      case 'getPendingRequests':
+        return getPendingRequests();
+      case 'approveRequest':
+        return approveRequest(e.parameter.requestId);
       default:
         return jsonResponse({ error: 'Unknown action', availableActions: ['getAll', 'getByCode', 'search', 'getCategories', 'getStats'] });
     }
@@ -57,6 +61,10 @@ function doPost(e) {
         return deleteErrorCode(e.parameter.code);
       case 'batchImport':
         return batchImport(e.postData.contents);
+      case 'submitRequest':
+        return submitRequest(e.parameter);
+      case 'approveRequest':
+        return approveRequest(e.parameter.requestId);
       default:
         return jsonResponse({ error: 'Unknown action' }, 400);
     }
@@ -389,6 +397,184 @@ function exportData() {
     success: true,
     count: errorCodes.length,
     data: errorCodes
+  });
+}
+
+/**
+ * 提交新代碼申請
+ */
+function submitRequest(params) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // 獲取或創建申請表
+  let sheet = ss.getSheetByName('PendingRequests');
+  if (!sheet) {
+    sheet = ss.insertSheet('PendingRequests');
+    sheet.appendRow(['RequestID', 'Code', 'Description', 'Category', 'RequesterEmail', 'Notes', 'RequestDate', 'Status', 'CreatedAt']);
+  }
+  
+  // 生成 Request ID
+  const requestId = 'REQ-' + new Date().getTime();
+  
+  // 新增申請
+  sheet.appendRow([
+    requestId,
+    params.code,
+    params.description,
+    params.category,
+    params.requesterEmail,
+    params.notes || '',
+    params.requestDate,
+    'pending',
+    new Date()
+  ]);
+  
+  // 發送郵件給 Real 哥
+  sendApprovalEmail(params, requestId);
+  
+  return jsonResponse({
+    success: true,
+    requestId: requestId,
+    message: '申請已提交，審核郵件已發送'
+  });
+}
+
+/**
+ * 發送審核郵件
+ */
+function sendApprovalEmail(params, requestId) {
+  const realEmail = 'real@example.com'; // 替換為 Real 哥的實際郵箱
+  
+  const approvalLink = `https://script.google.com/macros/s/AKfycbwQlNiZ_YNiCNME9Ie7vP7REQXERaYUZaGb78LoeFBiNQk5m-t_kss06mRQmFNiTpzT/exec?action=approveRequest&requestId=${requestId}`;
+  
+  const subject = `📋 Error Code 新增申請待審核 [${requestId}]`;
+  
+  const body = `
+您好，
+
+收到一筆新的 Error Code 新增申請，請審核：
+
+━━━━━━━━━━━━━━━━━━━━━━
+📝 申請詳情
+━━━━━━━━━━━━━━━━━━━━━━
+申請編號：${requestId}
+Error Code：${params.code}
+錯誤描述：${params.description}
+類別：${params.category}
+申請人：${params.requesterEmail}
+申請日期：${params.requestDate}
+
+補充說明：
+${params.notes || '無'}
+
+━━━━━━━━━━━━━━━━━━━━━━
+🔐 審核操作
+━━━━━━━━━━━━━━━━━━━━━━
+請點擊下方連結確認新增：
+${approvalLink}
+
+或直接複製網址到瀏覽器：
+${approvalLink}
+
+━━━━━━━━━━━━━━━━━━━━━━
+此為系統自動發送郵件，請勿回覆
+`;
+  
+  try {
+    MailApp.sendEmail({
+      to: realEmail,
+      subject: subject,
+      body: body
+    });
+    Logger.log(`✅ 審核郵件已發送至：${realEmail}`);
+  } catch (error) {
+    Logger.error(`❌ 郵件發送失敗：${error.message}`);
+  }
+}
+
+/**
+ * 獲取待審核申請
+ */
+function getPendingRequests() {
+  const sheet = getSheet('PendingRequests');
+  if (!sheet) {
+    return jsonResponse({ success: true, requests: [] });
+  }
+  
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  
+  const requests = data.slice(1)
+    .filter(row => row[7] === 'pending')
+    .map(row => {
+      const obj = {};
+      headers.forEach((header, index) => {
+        obj[header] = row[index];
+      });
+      return obj;
+    });
+  
+  return jsonResponse({
+    success: true,
+    count: requests.length,
+    requests: requests
+  });
+}
+
+/**
+ * 審核通過申請
+ */
+function approveRequest(requestId) {
+  if (!requestId) {
+    return jsonResponse({ error: 'Request ID required' }, 400);
+  }
+  
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const requestSheet = ss.getSheetByName('PendingRequests');
+  const errorSheet = getSheet('ErrorCodes');
+  
+  if (!requestSheet) {
+    return jsonResponse({ error: 'PendingRequests sheet not found' }, 404);
+  }
+  
+  // 查找申請
+  const requestData = requestSheet.getDataRange().getValues();
+  const rowIndex = requestData.slice(1).findIndex(row => row[0] === requestId);
+  
+  if (rowIndex === -1) {
+    return jsonResponse({ error: 'Request not found', requestId: requestId }, 404);
+  }
+  
+  const actualRowIndex = rowIndex + 2; // +2 因為有標題行且 0-indexed
+  const request = requestData[actualRowIndex - 1];
+  
+  // 新增到 ErrorCodes 表
+  errorSheet.appendRow([
+    request[1], // Code
+    request[2], // Description
+    request[3], // Category
+    new Date()
+  ]);
+  
+  // 更新申請狀態
+  requestSheet.getRange(actualRowIndex, 8).setValue('approved');
+  requestSheet.getRange(actualRowIndex, 9).setValue(new Date());
+  
+  // 發送通知郵件
+  try {
+    MailApp.sendEmail({
+      to: request[4], // RequesterEmail
+      subject: `✅ Error Code 新增申請已通過 [${requestId}]`,
+      body: `\n您好，\n\n您的 Error Code 新增申請已通過審核並正式生效：\n\nError Code：${request[1]}\n錯誤描述：${request[2]}\n類別：${request[3]}\n\n感謝您的貢獻！\n\n此為系統自動發送郵件`
+    });
+  } catch (error) {
+    Logger.error(`通知郵件發送失敗：${error.message}`);
+  }
+  
+  return jsonResponse({
+    success: true,
+    message: '申請已通過，Error Code 已新增',
+    code: request[1]
   });
 }
 

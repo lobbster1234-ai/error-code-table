@@ -3,109 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error Code Table 比對系統</title>
+    <title>Error Code 批量比對系統</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/enhanced-styles.css">
+    <link rel="stylesheet" href="css/bulk-compare.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🔍 Error Code Table 比對系統</h1>
-            <p class="subtitle">快速查詢與比對 RF 測試錯誤代碼</p>
+            <h1>📋 Error Code 批量比對系統</h1>
+            <p class="subtitle">貼上錯誤代碼清單，立即比對並找出匹配結果</p>
         </header>
 
-        <div class="search-section">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="輸入錯誤代碼或描述進行搜尋..." autocomplete="off">
-            </div>
-            <div id="searchResults"></div>
-        </div>
-
-        <div class="stats-section">
-            <div class="stat-card">
-                <span class="stat-number" id="totalCount">0</span>
-                <span class="stat-label">總錯誤數</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" id="filteredCount">0</span>
-                <span class="stat-label">搜尋結果</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" id="categoryCount">0</span>
-                <span class="stat-label">類別數</span>
+        <div class="input-section">
+            <h2>📝 輸入 Error Code 清單</h2>
+            <p class="hint">請貼上一串 Error Code，每行一個（支援代碼或描述）</p>
+            <textarea id="bulkInput" placeholder="例如：
+NT001
+NT002
+Can't Open Adapter
+Power Calibration Fail"></textarea>
+            <div class="button-group">
+                <button id="compareBtn" class="btn-primary">🔍 開始比對</button>
+                <button id="clearBtn" class="btn-secondary">清除</button>
             </div>
         </div>
 
-        <div class="compare-section">
-            <h2>📊 比對模式</h2>
-            <div class="compare-inputs">
-                <div class="compare-box">
-                    <h3>清單 A</h3>
-                    <textarea id="compareListA" placeholder="輸入錯誤代碼清單，每行一個&#10;例如：&#10;NT001&#10;NT002&#10;BT001"></textarea>
-                </div>
-                <div class="compare-box">
-                    <h3>清單 B</h3>
-                    <textarea id="compareListB" placeholder="輸入錯誤代碼清單，每行一個&#10;例如：&#10;NT001&#10;NT003&#10;BT001"></textarea>
-                </div>
-            </div>
-            <button id="compareBtn" class="compare-btn">開始比對</button>
+        <div id="resultsSection" class="results-section" style="display: none;">
+            <h2>📊 比對結果</h2>
             
-            <div id="compareResult" class="compare-result" style="display: none;">
-                <h3>比對結果</h3>
-                <div class="compare-stats">
-                    <div class="compare-stat">
-                        <span class="stat-label">僅在 A 中：</span>
-                        <span id="onlyInA" class="stat-value">0</span>
-                    </div>
-                    <div class="compare-stat">
-                        <span class="stat-label">僅在 B 中：</span>
-                        <span id="onlyInB" class="stat-value">0</span>
-                    </div>
-                    <div class="compare-stat">
-                        <span class="stat-label">兩者都有：</span>
-                        <span id="inBoth" class="stat-value">0</span>
-                    </div>
+            <div class="stats-bar">
+                <div class="stat-item exact">
+                    <span class="stat-number" id="exactCount">0</span>
+                    <span class="stat-label">✅ 完全匹配</span>
                 </div>
-                <div class="compare-details">
-                    <div class="compare-column">
-                        <h4>僅在清單 A 中</h4>
-                        <ul id="onlyAList"></ul>
-                    </div>
-                    <div class="compare-column">
-                        <h4>僅在清單 B 中</h4>
-                        <ul id="onlyBList"></ul>
-                    </div>
-                    <div class="compare-column">
-                        <h4>兩者都有</h4>
-                        <ul id="bothList"></ul>
-                    </div>
+                <div class="stat-item fuzzy">
+                    <span class="stat-number" id="fuzzyCount">0</span>
+                    <span class="stat-label">🔍 相近匹配</span>
+                </div>
+                <div class="stat-item notfound">
+                    <span class="stat-number" id="notFoundCount">0</span>
+                    <span class="stat-label">❌ 未找到</span>
                 </div>
             </div>
-        </div>
 
-        <div class="results-section">
-            <h2>📋 搜尋結果</h2>
-            <div id="resultsTable" class="results-table">
-                <div class="table-header">
-                    <div class="col-code">錯誤代碼</div>
-                    <div class="col-category">類別</div>
-                    <div class="col-description">描述</div>
-                </div>
-                <div id="resultsBody" class="table-body">
-                    <!-- 結果將動態插入 -->
+            <!-- 完全匹配結果 -->
+            <div id="exactMatches" class="result-category">
+                <h3>✅ 完全匹配</h3>
+                <div class="results-table">
+                    <div class="table-header">
+                        <div class="col-input">輸入內容</div>
+                        <div class="col-code">Error Code</div>
+                        <div class="col-desc">描述</div>
+                        <div class="col-category">類別</div>
+                    </div>
+                    <div id="exactList" class="table-body"></div>
                 </div>
             </div>
-            <div id="noResults" class="no-results" style="display: none;">
-                <p>找不到符合的錯誤代碼</p>
+
+            <!-- 相近匹配結果 -->
+            <div id="fuzzyMatches" class="result-category">
+                <h3>🔍 相近匹配（建議選項）</h3>
+                <div id="fuzzyList"></div>
+            </div>
+
+            <!-- 未找到結果 -->
+            <div id="notFound" class="result-category">
+                <h3>❌ 未找到匹配</h3>
+                <p class="not-found-hint">以下 Error Code 在系統中找不到，請確認是否需要新增</p>
+                <div id="notFoundList"></div>
+                
+                <div class="add-new-section">
+                    <h4>📝 申請新增 Error Code</h4>
+                    <form id="newCodeForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Error Code *</label>
+                                <input type="text" id="newCode" placeholder="例如：NT999" required>
+                            </div>
+                            <div class="form-group">
+                                <label>類別 *</label>
+                                <select id="newCategory" required>
+                                    <option value="">選擇類別</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>錯誤描述 *</label>
+                            <input type="text" id="newDescription" placeholder="請輸入完整的錯誤描述" required>
+                        </div>
+                        <div class="form-group">
+                            <label>發現場景/補充說明</label>
+                            <textarea id="newNotes" rows="3" placeholder="請描述是在什麼情況下發現這個 Error Code..."></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>申請人 Email *</label>
+                                <input type="email" id="requesterEmail" placeholder="your@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>申請日期</label>
+                                <input type="date" id="requestDate" readonly>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            📧 提交申請（將發送審核郵件給 Real 哥）
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 匯出功能 -->
+            <div class="export-section">
+                <button id="exportBtn" class="btn-export">📥 匯出比對結果（CSV）</button>
             </div>
         </div>
 
         <footer>
-            <p>Error Code Table 比對系統 &copy; 2026 | 資料來源：Error Code Table 20250626.doc</p>
+            <p>Error Code 批量比對系統 | 資料來源：Google Sheets</p>
         </footer>
     </div>
 
     <script src="js/fuzzy-search.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/bulk-compare.js"></script>
 </body>
 </html>
