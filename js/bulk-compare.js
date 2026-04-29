@@ -147,14 +147,20 @@ function displayResults() {
             <div class="fuzzy-item">
                 <div class="fuzzy-header">
                     <span class="fuzzy-code">輸入：${escapeHtml(item.input)}</span>
-                    <span class="similarity-badge">${Math.round(item.matches[0].similarity * 100)}% 相似</span>
                 </div>
-                <div class="fuzzy-description">
-                    <strong>建議：</strong> ${escapeHtml(item.matches[0].code)} - ${escapeHtml(item.matches[0].description)}
-                </div>
-                <div class="fuzzy-suggestion">
-                    類別：${escapeHtml(item.matches[0].category)} | 
-                    匹配欄位：${item.matches[0].matchType === 'code' ? '代碼' : '描述'}
+                <div class="fuzzy-suggestions">
+                    <p><strong>以下是相似度 >50% 的建議選項：</strong></p>
+                    ${item.matches.slice(0, 5).map((match, index) => `
+                        <div class="fuzzy-match-item">
+                            <div class="match-row">
+                                <span class="match-number">#${index + 1}</span>
+                                <span class="match-code">${escapeHtml(match.code)}</span>
+                                <span class="match-similarity">${Math.round(match.similarity * 100)}% 相似</span>
+                            </div>
+                            <div class="match-description">${escapeHtml(match.description)}</div>
+                            <div class="match-category">類別：${escapeHtml(match.category)} | 匹配欄位：${match.matchType === 'code' ? '代碼' : '描述'}</div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `).join('');
