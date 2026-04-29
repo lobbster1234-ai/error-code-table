@@ -203,36 +203,60 @@
     font-size: 0.9em;
 }
 
-/* Fuzzy Match Items */
-.fuzzy-item {
-    background: white;
+/* 模糊匹配建议项 */
+.fuzzy-suggestions {
+    margin-top: 10px;
+}
+
+.fuzzy-suggestions > p {
+    color: #6c757d;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.fuzzy-match-item {
+    background: #fff3cd;
     border: 2px solid #ffc107;
     border-radius: 10px;
     padding: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     transition: all 0.3s ease;
 }
 
-.fuzzy-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(255, 193, 7, 0.3);
+.fuzzy-match-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 3px 10px rgba(255, 193, 7, 0.3);
 }
 
-.fuzzy-header {
+.match-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    gap: 15px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
 }
 
-.fuzzy-code {
+.match-number {
+    background: #8DB600;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.95em;
+}
+
+.match-code {
     font-family: 'Courier New', monospace;
     font-size: 1.3em;
     font-weight: bold;
-    color: #667eea;
+    color: #8DB600;
 }
 
-.similarity-badge {
+.match-similarity {
     background: #ffc107;
     color: #333;
     padding: 5px 15px;
@@ -241,14 +265,17 @@
     font-size: 0.9em;
 }
 
-.fuzzy-description {
+.match-description {
     color: #333;
-    margin-bottom: 10px;
+    font-size: 1em;
+    margin: 8px 0;
+    padding-left: 50px;
 }
 
-.fuzzy-suggestion {
-    font-size: 0.9em;
+.match-category {
     color: #6c757d;
+    font-size: 0.85em;
+    padding-left: 50px;
 }
 
 /* Not Found List */
