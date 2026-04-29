@@ -97,10 +97,11 @@ async function performBulkCompare() {
             continue;
         }
         
-        // 2. 模糊匹配
-        const fuzzyResults = fuzzySearch(inputItem, errorCodes, 1);
+        // 2. 模糊匹配（>50% 相似度，最多 5 項）
+        const fuzzyResults = fuzzySearch(inputItem, errorCodes, 5)
+            .filter(item => item.similarity > 0.5);
         
-        if (fuzzyResults.length > 0 && fuzzyResults[0].similarity > 0.5) {
+        if (fuzzyResults.length > 0) {
             compareResults.fuzzy.push({
                 input: inputItem,
                 matches: fuzzyResults

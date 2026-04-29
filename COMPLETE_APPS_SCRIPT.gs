@@ -443,7 +443,7 @@ function submitRequest(params) {
  * 發送審核郵件
  */
 function sendApprovalEmail(params, requestId) {
-  const realEmail = 'real@example.com'; // 替換為 Real 哥的實際郵箱
+  const realEmail = 'real_chang@arcadyan.com.tw'; // 替換為 Real 哥的實際郵箱
   
   const approvalLink = `https://script.google.com/macros/s/AKfycbwQlNiZ_YNiCNME9Ie7vP7REQXERaYUZaGb78LoeFBiNQk5m-t_kss06mRQmFNiTpzT/exec?action=approveRequest&requestId=${requestId}`;
   
