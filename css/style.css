@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #FFDDAA 0%, #FFC078 100%);
+    background: #e8eef3;
     min-height: 100vh;
     padding: 20px;
     color: #333;
@@ -22,8 +22,8 @@ body {
 }
 
 header {
-    background: linear-gradient(135deg, #FFDDAA 0%, #FFC078 100%);
-    color: white;
+    background: #FFDDAA;
+    color: #5a4a00;
     padding: 40px;
     text-align: center;
 }
@@ -37,7 +37,7 @@ header h1 {
 
 .subtitle {
     font-size: 1.2em;
-    opacity: 0.9;
+    color: #856404;
 }
 
 .search-section {
@@ -80,7 +80,7 @@ button {
 }
 
 #searchBtn {
-    background: linear-gradient(135deg, #FFDDAA 0%, #FFC078 100%);
+    background: #f0f4f8;
     color: white;
 }
 
