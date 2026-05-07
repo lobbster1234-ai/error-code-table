@@ -15,7 +15,7 @@
     height: 450px;
     overflow-y: auto;
     padding: 24px;
-    background: linear-gradient(180deg, #fffaf0 0%, #f8f9fa 100%);
+    background: linear-gradient(180deg, #FFDDAA 0%, #FFE8CC 100%);
 }
 
 /* 歡迎訊息 */
@@ -25,7 +25,7 @@
     padding: 24px;
     background: white;
     border-radius: 16px;
-    border: 2px solid #ffe8cc;
+    border: 2px solid #CC9955;
     margin-bottom: 16px;
 }
 
@@ -138,11 +138,11 @@
 
 /* 思考分析 */
 .thinking-box {
-    background: #fffaf0;
+    background: #FFEEBB;
     border-radius: 12px;
     padding: 12px 16px;
     margin-bottom: 12px;
-    border-left: 4px solid #FFDDAA;
+    border-left: 4px solid #CC9955;
 }
 
 .thinking-label {
@@ -233,8 +233,8 @@
 
 /* 建議文字 */
 .suggestions-box {
-    background: #fffaf0;
-    border-left: 4px solid #FFDDAA;
+    background: #FFEEBB;
+    border-left: 4px solid #CC9955;
     padding: 12px 16px;
     margin-top: 12px;
     border-radius: 0 8px 8px 0;
@@ -294,8 +294,8 @@
 }
 
 .hint-btn {
-    background: #fffaf0;
-    border: 1px solid #ffe8cc;
+    background: #FFEEBB;
+    border: 1px solid #CC9955;
     border-radius: 20px;
     padding: 8px 16px;
     font-size: 13px;
@@ -400,7 +400,7 @@
 }
 
 .bulk-toggle:hover {
-    background: #fffaf0;
+    background: #FFDDAA;
 }
 
 .bulk-toggle span:first-child {
