@@ -135,11 +135,11 @@ class AIAssistant {
             console.warn('Groq failed, using local results');
             return JSON.stringify({
                 ...allResults,
-                recommendations: allResults.recommendations ? allResults.recommendations.slice(0, 15) : []
+                recommendations: allResults.recommendations ? allResults.recommendations.slice(0, 10) : []
             });
         }
         
-        const finalResults = result.data.recommendations || (allResults.recommendations ? allResults.recommendations.slice(0, 15) : []);
+        const finalResults = result.data.recommendations || (allResults.recommendations ? allResults.recommendations.slice(0, 10) : []);
         
         const sortedResults = finalResults.map(rec => ({
             ...rec,
@@ -153,7 +153,7 @@ class AIAssistant {
         });
     }
 
-    performLocalSearch(userInput, maxResults = 15) {
+    performLocalSearch(userInput, maxResults = 10) {
         const userLower = userInput.toLowerCase();
         const keywords = userLower.split(/\s+/).filter(w => w.length >= 2);
         
