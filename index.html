@@ -34,12 +34,12 @@
                 </div>
                 <div class="ai-input-section">
                     <div class="quick-hints">
-                        <button class="hint-btn" onclick="askQuestion('相機測試錯誤')}">📷 相機測試錯誤</button>
-                        <button class="hint-btn" onclick="askQuestion('電源供應問題')}">⚡ 電源問題</button>
-                        <button class="hint-btn" onclick="askQuestion('網路連線失敗')}">🌐 網路連線</button>
-                        <button class="hint-btn" onclick="askQuestion('藍牙配對失敗')}">📶 藍牙失敗</button>
-                        <button class="hint-btn" onclick="askQuestion('記憶體讀寫錯誤')}">💾 記憶體錯誤</button>
-                        <button class="hint-btn" onclick="askQuestion('校正逾時')}">⏱️ 校正逾時</button>
+                        <button class="hint-btn" onclick="askQuestion('相機測試錯誤')">📷 相機測試錯誤</button>
+                        <button class="hint-btn" onclick="askQuestion('電源供應問題')">⚡ 電源問題</button>
+                        <button class="hint-btn" onclick="askQuestion('網路連線失敗')">🌐 網路連線</button>
+                        <button class="hint-btn" onclick="askQuestion('藍牙配對失敗')">📶 藍牙失敗</button>
+                        <button class="hint-btn" onclick="askQuestion('記憶體讀寫錯誤')">💾 記憶體錯誤</button>
+                        <button class="hint-btn" onclick="askQuestion('校正逾時')">⏱️ 校正逾時</button>
                     </div>
                     <div class="input-row">
                         <textarea id="aiInput" placeholder="輸入你的問題..." rows="1"></textarea>
@@ -106,6 +106,45 @@ Power Calibration Fail"></textarea>
                     <div id="notFound" class="result-category">
                         <h3>❌ 未找到匹配</h3>
                         <div id="notFoundList"></div>
+                    </div>
+
+                    <div class="add-new-section" style="display:none;">
+                        <h4>📝 申請新增 Error Code</h4>
+                        <form id="newCodeForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Error Code *</label>
+                                    <input type="text" id="newCode" placeholder="例如：NT999" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>類別 *</label>
+                                    <select id="newCategory" required>
+                                        <option value="">選擇類別</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>錯誤描述 *</label>
+                                <input type="text" id="newDescription" placeholder="請輸入完整的錯誤描述" required>
+                            </div>
+                            <div class="form-group">
+                                <label>發現場景/補充說明</label>
+                                <textarea id="newNotes" rows="3" placeholder="請描述是在什麼情況下發現這個 Error Code..."></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>申請人 Email *</label>
+                                    <input type="email" id="requesterEmail" placeholder="your@email.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>申請日期</label>
+                                    <input type="date" id="requestDate" readonly>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-submit">
+                                📧 提交申請（將發送審核郵件給管理員）
+                            </button>
+                        </form>
                     </div>
 
                     <div class="export-section">
