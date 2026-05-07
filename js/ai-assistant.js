@@ -316,8 +316,8 @@ class AIAssistant {
                             <span class="confidence" style="background: ${confidenceColor}">${rec.confidence || '無'}</span>
                         </div>
                         <div class="card-body">
-                            <div class="desc-en">${this.escapeHtml(rec.reason)}</div>
-                            <div class="desc-zh">${this.escapeHtml(rec.reason_zh || rec.reason)}</div>
+                            <div class="desc-en"><strong>原文：</strong>${this.escapeHtml(rec.reason)}</div>
+                            ${rec.reason_zh && rec.reason_zh !== rec.reason ? `<div class="desc-zh"><strong>翻譯：</strong>${this.escapeHtml(rec.reason_zh)}</div>` : ''}
                         </div>
                         ${rec.score ? `<div class="card-score">匹配分數：${rec.score}</div>` : ''}
                     </div>
