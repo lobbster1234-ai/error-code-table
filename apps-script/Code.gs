@@ -287,8 +287,8 @@ function deleteErrorCode(code) {
  */
 function askAI(question, context) {
   try {
-    // Groq API Key
-    const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE';
+    // Groq API Key - 請替換成你的 Key
+    const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE'; // ⚠️ 請改成你的 Groq API Key
     const MODEL = 'llama-3.3-70b-versatile';
     
     // 組合 prompt
