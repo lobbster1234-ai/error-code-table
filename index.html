@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error Code 批量比對系統</title>
+    <title>Error Code 查詢系統 - AI 助理</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/bulk-compare.css">
     <link rel="stylesheet" href="css/ai-assistant.css">
@@ -11,139 +11,117 @@
 <body>
     <div class="container">
         <header>
-            <h1>📋 Error Code 批量比對系統</h1>
-            <p class="subtitle">貼上錯誤代碼清單，立即比對並找出匹配結果</p>
+            <h1>🤖 Error Code AI 查詢系統</h1>
+            <p class="subtitle">用自然語言描述你的問題，AI 幫你找出最相關的 Error Code</p>
         </header>
 
-        <div class="input-section">
-            <h2>📝 輸入 Error Code 清單</h2>
-            <p class="hint">請貼上一串 Error Code，每行一個（支援代碼或描述）</p>
-            <textarea id="bulkInput" placeholder="例如：
+        <!-- 主要 AI 助理區塊 -->
+        <div class="main-ai-section">
+            <div id="aiMainContainer" class="ai-main-container">
+                <div class="ai-messages" id="aiMessages">
+                    <div class="welcome-message">
+                        <div class="welcome-icon">🔍</div>
+                        <div class="welcome-text">
+                            <h3>嗨！我是 Error Code 查詢助理</h3>
+                            <p>你可以用自然語言描述問題，例如：</p>
+                            <ul>
+                                <li>「相機測試失敗」</li>
+                                <li>「電源校正錯誤」</li>
+                                <li>「藍牙連線逾時」</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="ai-input-section">
+                    <div class="quick-hints">
+                        <button class="hint-btn" onclick="askQuestion('相機測試錯誤')}">📷 相機測試錯誤</button>
+                        <button class="hint-btn" onclick="askQuestion('電源供應問題')}">⚡ 電源問題</button>
+                        <button class="hint-btn" onclick="askQuestion('網路連線失敗')}">🌐 網路連線</button>
+                        <button class="hint-btn" onclick="askQuestion('藍牙配對失敗')}">📶 藍牙失敗</button>
+                        <button class="hint-btn" onclick="askQuestion('記憶體讀寫錯誤')}">💾 記憶體錯誤</button>
+                        <button class="hint-btn" onclick="askQuestion('校正逾時')}">⏱️ 校正逾時</button>
+                    </div>
+                    <div class="input-row">
+                        <textarea id="aiInput" placeholder="輸入你的問題..." rows="1"></textarea>
+                        <button id="sendBtn" class="send-btn">➤</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 批量比對區塊（折疊式） -->
+        <div class="bulk-section">
+            <button class="bulk-toggle" onclick="toggleBulkSection()">
+                <span>📋 批量比對（一次查多筆）</span>
+                <span class="toggle-icon" id="bulkToggleIcon">▼</span>
+            </button>
+            <div id="bulkContent" class="bulk-content" style="display: none;">
+                <div class="input-section">
+                    <p class="hint">貼上 Error Code 清單（每行一個）</p>
+                    <textarea id="bulkInput" placeholder="例如：
 NT001
 NT002
 Can't Open Adapter
 Power Calibration Fail"></textarea>
-            <div class="button-group">
-                <button id="compareBtn" class="btn-primary">🔍 開始比對</button>
-                <button id="clearBtn" class="btn-secondary">清除</button>
-            </div>
-        </div>
-
-        <div id="resultsSection" class="results-section" style="display: none;">
-            <h2>📊 比對結果</h2>
-            
-            <div class="stats-bar">
-                <div class="stat-item exact">
-                    <span class="stat-number" id="exactCount">0</span>
-                    <span class="stat-label">✅ 完全匹配</span>
-                </div>
-                <div class="stat-item fuzzy">
-                    <span class="stat-number" id="fuzzyCount">0</span>
-                    <span class="stat-label">🔍 相近匹配</span>
-                </div>
-                <div class="stat-item notfound">
-                    <span class="stat-number" id="notFoundCount">0</span>
-                    <span class="stat-label">❌ 未找到</span>
-                </div>
-            </div>
-
-            <!-- 完全匹配結果 -->
-            <div id="exactMatches" class="result-category">
-                <h3>✅ 完全匹配</h3>
-                <div class="results-table">
-                    <div class="table-header">
-                        <div class="col-input">輸入內容</div>
-                        <div class="col-code">Error Code</div>
-                        <div class="col-desc">描述</div>
-                        <div class="col-category">類別</div>
+                    <div class="button-group">
+                        <button id="compareBtn" class="btn-primary">🔍 開始比對</button>
+                        <button id="clearBtn" class="btn-secondary">清除</button>
                     </div>
-                    <div id="exactList" class="table-body"></div>
                 </div>
-            </div>
 
-            <!-- 相近匹配結果 -->
-            <div id="fuzzyMatches" class="result-category">
-                <h3>🔍 相近匹配（建議選項）</h3>
-                <div id="fuzzyList"></div>
-            </div>
+                <div id="resultsSection" class="results-section" style="display: none;">
+                    <div class="stats-bar">
+                        <div class="stat-item exact">
+                            <span class="stat-number" id="exactCount">0</span>
+                            <span class="stat-label">✅ 完全匹配</span>
+                        </div>
+                        <div class="stat-item fuzzy">
+                            <span class="stat-number" id="fuzzyCount">0</span>
+                            <span class="stat-label">🔍 相近匹配</span>
+                        </div>
+                        <div class="stat-item notfound">
+                            <span class="stat-number" id="notFoundCount">0</span>
+                            <span class="stat-label">❌ 未找到</span>
+                        </div>
+                    </div>
 
-            <!-- 未找到結果 -->
-            <div id="notFound" class="result-category">
-                <h3>❌ 未找到匹配</h3>
-                <p class="not-found-hint">以下 Error Code 在系統中找不到，請確認是否需要新增</p>
-                <div id="notFoundList"></div>
-                
-                <div class="add-new-section">
-                    <h4>📝 申請新增 Error Code</h4>
-                    <form id="newCodeForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Error Code *</label>
-                                <input type="text" id="newCode" placeholder="例如：NT999" required>
+                    <div id="exactMatches" class="result-category">
+                        <h3>✅ 完全匹配</h3>
+                        <div class="results-table">
+                            <div class="table-header">
+                                <div class="col-input">輸入內容</div>
+                                <div class="col-code">Error Code</div>
+                                <div class="col-desc">描述</div>
+                                <div class="col-category">類別</div>
                             </div>
-                            <div class="form-group">
-                                <label>類別 *</label>
-                                <select id="newCategory" required>
-                                    <option value="">選擇類別</option>
-                                </select>
-                            </div>
+                            <div id="exactList" class="table-body"></div>
                         </div>
-                        <div class="form-group">
-                            <label>錯誤描述 *</label>
-                            <input type="text" id="newDescription" placeholder="請輸入完整的錯誤描述" required>
-                        </div>
-                        <div class="form-group">
-                            <label>發現場景/補充說明</label>
-                            <textarea id="newNotes" rows="3" placeholder="請描述是在什麼情況下發現這個 Error Code..."></textarea>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>申請人 Email *</label>
-                                <input type="email" id="requesterEmail" placeholder="your@email.com" required>
-                            </div>
-                            <div class="form-group">
-                                <label>申請日期</label>
-                                <input type="date" id="requestDate" readonly>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-submit">
-                            📧 提交申請（將發送審核郵件給 Real 哥）
-                        </button>
-                    </form>
+                    </div>
+
+                    <div id="fuzzyMatches" class="result-category">
+                        <h3>🔍 相近匹配（建議選項）</h3>
+                        <div id="fuzzyList"></div>
+                    </div>
+
+                    <div id="notFound" class="result-category">
+                        <h3>❌ 未找到匹配</h3>
+                        <div id="notFoundList"></div>
+                    </div>
+
+                    <div class="export-section">
+                        <button id="exportBtn" class="btn-export">📥 匯出比對結果（CSV）</button>
+                    </div>
                 </div>
-            </div>
-
-            <!-- 匯出功能 -->
-            <div class="export-section">
-                <button id="exportBtn" class="btn-export">📥 匯出比對結果（CSV）</button>
             </div>
         </div>
 
         <footer>
-            <p>Error Code 批量比對系統 | 資料來源：Google Sheets</p>
+            <p>Error Code 查詢系統 | 資料來源：Google Sheets | AI 助理：Groq Llama 3</p>
         </footer>
     </div>
 
     <script src="js/fuzzy-search.js"></script>
     <script src="js/bulk-compare.js"></script>
     <script src="js/ai-assistant.js"></script>
-
-    <!-- AI 助理 -->
-    <div id="aiAssistant" class="ai-assistant-container">
-        <div class="ai-header" onclick="aiAssistant.toggleMinimize()">
-            <h3><span class="ai-status"></span> 🤖 AI 助理</h3>
-            <button class="minimize-btn">−</button>
-        </div>
-        <div class="ai-chat-messages" id="aiChatMessages"></div>
-        <div class="ai-quick-hints">
-            <button class="ai-quick-hint-btn">相機測試錯誤</button>
-            <button class="ai-quick-hint-btn">電源相關</button>
-            <button class="ai-quick-hint-btn">通訊問題</button>
-        </div>
-        <div class="ai-input-area">
-            <textarea id="aiChatInput" placeholder="描述你的問題..." rows="1"></textarea>
-            <button id="aiSendBtn" class="ai-send-btn">➤</button>
-        </div>
-    </div>
 </body>
 </html>

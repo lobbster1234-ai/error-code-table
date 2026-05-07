@@ -16,16 +16,10 @@
  * GET /exec?action=getByCode&code=NT001 - 根據代碼查詢
  * GET /exec?action=search&q=keyword - 關鍵字搜尋
  * GET /exec?action=getCategories - 獲取所有類別
- * GET /exec?action=askAI&question=xxx&context=xxx - AI 問答（Groq Llama 3）
  */
 
 // Google Sheet ID（部署後會自動使用綁定的表格）
 const SHEET_ID = SpreadsheetApp.getActiveSpreadsheet().getId();
-
-// Groq API 設定
-const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
-const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 function doGet(e) {
   const action = e.parameter.action;
@@ -42,8 +36,10 @@ function doGet(e) {
         return getCategories();
       case 'getStats':
         return getStats();
+      case 'askAI':
+        return askAI(e.parameter.question, e.parameter.context);
       default:
-        return jsonResponse({ error: 'Unknown action', availableActions: ['getAll', 'getByCode', 'search', 'getCategories', 'getStats'] });
+        return jsonResponse({ error: 'Unknown action', availableActions: ['getAll', 'getByCode', 'search', 'getCategories', 'getStats', 'askAI'] });
     }
   } catch (error) {
     return jsonResponse({ error: error.message }, 500);
@@ -63,12 +59,12 @@ function doPost(e) {
         return deleteErrorCode(e.parameter.code);
       case 'batchImport':
         return batchImport(e.postData.contents);
-      case 'translate':
-        return translateTexts(e.postData.contents);
+      case 'submitRequest':
+        return submitRequest(e.parameter);
       case 'askAI':
         return askAI(e.parameter.question, e.parameter.context);
       default:
-        return jsonResponse({ error: 'Unknown action' }, 400);
+        return jsonResponse({ error: 'Unknown action: ' + action }, 400);
     }
   } catch (error) {
     return jsonResponse({ error: error.message }, 500);
@@ -285,42 +281,271 @@ function deleteErrorCode(code) {
 }
 
 /**
- * 批量翻譯（使用 Google Translate API）
+ * AI 智慧推薦（使用 Groq API - Llama 3）
+ * Groq 提供免費額度，速度快，品質高
  */
-function translateTexts(jsonData) {
+function askAI(question, context) {
   try {
-    const data = JSON.parse(jsonData);
-    const texts = data.texts || [];
+    // Groq API Key - 請替換成你的 Key
+    const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE'; // ⚠️ 請改成你的 Groq API Key
+    const MODEL = 'llama-3.3-70b-versatile'; // 或 llama-3.1-8b-instant（更快）
     
-    if (!texts || texts.length === 0) {
-      return jsonResponse({ success: false, error: 'No texts to translate' });
+    // 組合 prompt（給 LLM 完全自由）
+    const systemPrompt = `你是製造測試設備的 Error Code 助理，也是一個友善的 AI 助手。
+
+你的任務：
+1. 如果用戶問候（說嗨、你好），請友善回應，並詢問遇到什麼問題
+2. 如果提到設備或錯誤問題，從候選資料中推薦最相關的 Error Code
+3. 如果候選資料都不相關，誠實說明並建議申請新代碼
+
+候選資料庫（本地搜尋找到的相關項目）：
+${context}
+
+重要限制：
+- 你只能推薦上面候選資料中的代碼
+- 禁止回傳空陣列，必須至少推薦最相關的 1-5 個
+- 用中文回應，語氣自然友善
+
+回應格式（JSON，不要 markdown）：
+{
+  "thinking": "簡短說明你的判斷",
+  "recommendations": [
+    {"code": "代碼", "reason": "為什麼適合", "confidence": "高/中/低"}
+  ],
+  "suggestions": "給用戶的建議或回覆"
+}`;
+    
+    const userPrompt = `用戶問題："${question}"\n\n請分析並推薦最相關的 Error Code。`;
+    
+    // 呼叫 Groq API
+    const url = 'https://api.groq.com/openai/v1/chat/completions';
+    
+    const payload = {
+      model: MODEL,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      temperature: 0.3,
+      max_tokens: 1024
+      // 注意：Groq 不支援 response_format: { type: 'json_object' }
+    };
+    
+    const options = {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + GROQ_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    };
+    
+    const response = UrlFetchApp.fetch(url, options);
+    const responseCode = response.getResponseCode();
+    const resultText = response.getContentText();
+    
+    // 記錄原始回應（用於除錯）
+    console.log('Groq API Response Code:', responseCode);
+    console.log('Groq API Response:', resultText.substring(0, 500));
+    
+    // 如果 HTTP 狀態碼不是 200，回傳錯誤
+    if (responseCode !== 200) {
+      return jsonResponse({ 
+        success: false, 
+        error: `Groq API HTTP ${responseCode}: ${resultText.substring(0, 200)}`,
+        fallback: true 
+      });
     }
     
-    // 使用 Google Apps Script 內建的翻譯服務
-    const translations = texts.map(text => {
-      try {
-        // 翻譯成繁體中文
-        return LanguageApp.translate(text, 'en', 'zh-TW');
-      } catch (e) {
-        console.error('Translation error:', e);
-        return text; // 翻譯失敗回傳原文
-      }
-    });
+    const result = JSON.parse(resultText);
     
-    console.log(`✅ 翻譯完成：${translations.length} 筆`);
+    if (result.error) {
+      return jsonResponse({ 
+        success: false, 
+        error: result.error.message || 'Groq API error',
+        fallback: true 
+      });
+    }
+    
+    // 解析 Groq 回應
+    const content = result.choices?.[0]?.message?.content || '{}';
+    
+    // 嘗試解析 JSON
+    let aiResponse;
+    try {
+      // 確保內容是 JSON
+      const jsonStr = content.replace(/```json\n?|\n?```/g, '').trim();
+      aiResponse = JSON.parse(jsonStr);
+      
+      // 驗證必要欄位
+      if (!aiResponse.thinking) aiResponse.thinking = 'AI 已分析您的問題';
+      if (!aiResponse.recommendations) aiResponse.recommendations = [];
+      if (!aiResponse.suggestions) aiResponse.suggestions = '';
+      
+    } catch (e) {
+      // JSON 解析失敗，建立結構化回應
+      aiResponse = {
+        thinking: 'AI 已分析您的問題，但回應格式需要調整',
+        recommendations: [],
+        suggestions: content.substring(0, 500)
+      };
+    }
     
     return jsonResponse({
       success: true,
-      translations: translations
+      data: aiResponse,
+      model: MODEL
     });
     
   } catch (error) {
-    console.error('Batch translate error:', error);
+    console.error('Groq API error:', error);
     return jsonResponse({ 
       success: false, 
-      error: error.message 
+      error: error.message,
+      fallback: true 
     }, 500);
   }
+}
+
+/**
+ * 提交新 Error Code 申請
+ * 儲存到 Requests 工作表並發送通知郵件
+ */
+function submitRequest(params) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // 獲取或創建 Requests 工作表
+  let requestSheet = ss.getSheetByName('Requests');
+  if (!requestSheet) {
+    requestSheet = ss.insertSheet('Requests');
+    requestSheet.appendRow([
+      'RequestID', 
+      'Code', 
+      'Description', 
+      'Category', 
+      'Notes', 
+      'RequesterEmail', 
+      'RequestDate', 
+      'Status',
+      'ApprovedBy',
+      'ApprovedDate',
+      'ResponseMessage'
+    ]);
+    // 設定欄位寬度
+    requestSheet.setColumnWidth(1, 80);  // RequestID
+    requestSheet.setColumnWidth(2, 100); // Code
+    requestSheet.setColumnWidth(3, 300); // Description
+    requestSheet.setColumnWidth(4, 150); // Category
+    requestSheet.setColumnWidth(5, 300); // Notes
+    requestSheet.setColumnWidth(6, 200); // RequesterEmail
+    requestSheet.setColumnWidth(7, 120); // RequestDate
+    requestSheet.setColumnWidth(8, 100); // Status
+    requestSheet.setColumnWidth(9, 150); // ApprovedBy
+    requestSheet.setColumnWidth(10, 120); // ApprovedDate
+    requestSheet.setColumnWidth(11, 300); // ResponseMessage
+  }
+  
+  // 生成唯一請求 ID
+  const requestId = 'REQ-' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd-HHmmss') + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+  
+  // 準備資料列
+  const newRow = [
+    requestId,
+    params.code,
+    params.description,
+    params.category || '待分類',
+    params.notes || '',
+    params.requesterEmail,
+    new Date(),
+    'pending', // Status: pending, approved, rejected
+    '', // ApprovedBy
+    '', // ApprovedDate
+    '' // ResponseMessage
+  ];
+  
+  // 寫入工作表
+  requestSheet.appendRow(newRow);
+  
+  // 發送通知郵件給 Real 哥
+  try {
+    const subject = `[Error Code 申請] 新請求 ${requestId} - ${params.code}`;
+    const body = `
+有新的 Error Code 申請需要審核。
+
+━━━━━━━━━━━━━━━━━━━━━
+📋 申請詳情
+━━━━━━━━━━━━━━━━━━━━━
+
+請求編號：${requestId}
+申請代碼：${params.code}
+錯誤描述：${params.description}
+類別：${params.category || '待分類'}
+
+補充說明：
+${params.notes || '(無)'}
+
+━━━━━━━━━━━━━━━━━━━━━
+👤 申請人資訊
+━━━━━━━━━━━━━━━━━━━━━
+
+Email：${params.requesterEmail}
+申請時間：${Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss')}
+
+━━━━━━━━━━━━━━━━━━━━━
+🔗 快速操作
+━━━━━━━━━━━━━━━━━━━━━
+
+1. 查看申請清單：
+   ${ss.getUrl()}#gid=${requestSheet.getSheetId()}
+
+2. 審核完成後，請回覆申請人並更新工作表「Status」欄位。
+
+此郵件由 Error Code 批量比對系統自動發送。
+    `;
+    
+    // 發送給 Real 哥（這裡改成實際的 Email）
+    MailApp.sendEmail({
+      to: 'real@example.com', // ⚠️ 請改成 Real 哥的真實 Email
+      subject: subject,
+      body: body,
+      name: 'Error Code 系統通知'
+    });
+    
+    // 同時發送副本給申請人
+    MailApp.sendEmail({
+      to: params.requesterEmail,
+      subject: `[Error Code 申請已提交] ${requestId}`,
+      body: `
+您好，
+
+您的 Error Code 申請已收到，我們會盡快審核。
+
+請求編號：${requestId}
+申請代碼：${params.code}
+
+審核結果將通知至此 Email。
+
+━━━━━━━━━━━━━━━━━━━━━
+Error Code 批量比對系統
+      `,
+      name: 'Error Code 系統通知'
+    });
+    
+  } catch (emailError) {
+    console.error('郵件發送失敗:', emailError);
+    // 郵件失敗不影響 API 回應，但會記錄在日誌
+  }
+  
+  return jsonResponse({
+    success: true,
+    message: '申請已提交，審核郵件已發送',
+    data: {
+      requestId: requestId,
+      code: params.code,
+      status: 'pending'
+    }
+  });
 }
 
 /**
@@ -439,117 +664,6 @@ function exportData() {
     count: errorCodes.length,
     data: errorCodes
   });
-}
-
-// ===== AI 助理 - Groq Llama 3 =====
-
-/**
- * AI 問答（使用 Groq Llama 3）
- */
-function askAI(question, context) {
-  try {
-    if (!question) {
-      return jsonResponse({ success: false, error: 'Question is required' }, 400);
-    }
-    
-    // 建構系統提示
-    const systemPrompt = `你是 Error Code 查詢助理。你的任務是根據使用者問題和提供的上下文，從錯誤代碼清單中找出最相關的項目。
-
-你必須嚴格遵守以下輸出格式（只回傳 JSON，不要有任何其他文字）：
-{
-  "thinking": "你的分析過程，簡短說明如何匹配",
-  "recommendations": [
-    {"code": "代碼", "reason": "為什麼這個代碼相關", "confidence": "高/中/低"},
-    ...
-  ],
-  "suggestions": "給使用者的建議或補充說明"
-}
-
-請從提供的上下文（最多 30 個候選）中，挑選最相關的 10 個（或少於 10 個如果相關的不足 10 個）。
-按照相關程度由高到低排序。confidence 高適用於完全匹配的，中適用於部分匹配的，低適用於模糊匹配的。`;
-
-    // 建構使用者訊息
-    const userMessage = `問題：${question}\n\n上下文：\n${context}`;
-    
-    // 呼叫 Groq API
-    const response = UrlFetchApp.fetch(GROQ_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      payload: JSON.stringify({
-        model: GROQ_MODEL,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userMessage }
-        ],
-        temperature: 0.3,
-        max_tokens: 2000
-      }),
-      muteHttpExceptions: true
-    });
-    
-    const responseCode = response.getResponseCode();
-    const responseText = response.getContentText();
-    
-    if (responseCode !== 200) {
-      console.error('Groq API 錯誤:', responseCode, responseText);
-      return jsonResponse({ 
-        success: false, 
-        error: `Groq API 錯誤: ${responseCode}`,
-        recommendations: []
-      });
-    }
-    
-    const result = JSON.parse(responseText);
-    
-    if (result.error) {
-      console.error('Groq 回傳錯誤:', result.error);
-      return jsonResponse({ 
-        success: false, 
-        error: result.error.message || result.error,
-        recommendations: []
-      });
-    }
-    
-    // 解析 LLM 回應
-    const llmContent = result.choices[0].message.content;
-    
-    // 嘗試解析 JSON
-    let recommendations;
-    try {
-      // 找出 JSON 區塊
-      const jsonMatch = llmContent.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        recommendations = parsed;
-      } else {
-        throw new Error('No JSON found');
-      }
-    } catch (parseError) {
-      console.error('JSON 解析失敗:', parseError);
-      return jsonResponse({ 
-        success: false, 
-        error: 'LLM 回應格式錯誤',
-        rawResponse: llmContent,
-        recommendations: []
-      });
-    }
-    
-    return jsonResponse({
-      success: true,
-      data: recommendations
-    });
-    
-  } catch (error) {
-    console.error('askAI 函數錯誤:', error);
-    return jsonResponse({ 
-      success: false, 
-      error: error.message || '未知錯誤',
-      recommendations: []
-    }, 500);
-  }
 }
 
 // ===== 輔助函數 =====

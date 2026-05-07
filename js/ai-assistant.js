@@ -1,29 +1,25 @@
-// AI 助理模組 - 使用 Groq LLM (Llama 3) + 本地智慧搜尋回退
-// Groq 提供高速免費 API，品質接近 GPT-4
+// AI 助理模組 - 主要介面
+// 使用 Groq LLM (Llama 3) + 本地智慧搜尋回退
 
 class AIAssistant {
     constructor() {
         this.errorCodes = [];
-        this.chatHistory = [];
         this.isProcessing = false;
         this.API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwQlNiZ_YNiCNME9Ie7vP7REQXERaYUZaGb78LoeFBiNQk5m-t_kss06mRQmFNiTpzT/exec';
     }
 
     async init() {
         console.log('🤖 AI 助理初始化中...');
+        this.showLoading();
         await this.loadData();
         this.setupUI();
-        this.showMessage('system', '🚀 使用 Groq AI (Llama 3) - 高速推理');
         console.log('✅ AI 助理準備完成');
     }
 
     async loadData() {
         try {
-            console.log('📡 呼叫 API:', `${this.API_BASE_URL}?action=getAll`);
             const response = await fetch(`${this.API_BASE_URL}?action=getAll`);
-            console.log('📥 回應狀態:', response.status);
             const data = await response.json();
-            console.log('📦 回應資料:', data);
             
             if (data.success && data.data) {
                 this.errorCodes = data.data.map(item => ({
@@ -33,91 +29,108 @@ class AIAssistant {
                     description_zh: item.Description_ZH || item.Description_zh
                 }));
                 console.log(`✅ 載入 ${this.errorCodes.length} 筆 Error Code`);
-                this.showMessage('system', `✅ 已載入 ${this.errorCodes.length} 筆 Error Code`);
+                this.hideLoading();
             } else {
-                console.error('API 回應格式錯誤:', data);
-                this.showMessage('system', `❌ API 回應錯誤：${JSON.stringify(data)}`);
+                this.showError('載入資料失敗');
             }
         } catch (error) {
             console.error('載入資料失敗:', error);
-            this.showMessage('system', `❌ 載入失敗：${error.message}`);
-            this.showMessage('system', '💡 請確認 Google Apps Script 已正確部署');
+            this.showError('無法連接到伺服器');
         }
     }
 
     setupUI() {
-        const container = document.getElementById('aiAssistant');
-        if (!container) return;
-
-        container.querySelectorAll('.ai-quick-hint-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.getElementById('aiChatInput').value = btn.textContent;
-                this.sendMessage();
+        const input = document.getElementById('aiInput');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        if (sendBtn) {
+            sendBtn.addEventListener('click', () => this.sendMessage());
+        }
+        
+        if (input) {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
             });
-        });
+        }
+    }
 
-        const sendBtn = document.getElementById('aiSendBtn');
-        const input = document.getElementById('aiChatInput');
-        
-        sendBtn.addEventListener('click', () => this.sendMessage());
-        
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                this.sendMessage();
-            }
-        });
+    showLoading() {
+        const messages = document.getElementById('aiMessages');
+        if (messages) {
+            messages.innerHTML = `
+                <div class="loading-message">
+                    <div class="loading-icon">⏳</div>
+                    <p>載入中...</p>
+                </div>
+            `;
+        }
+    }
+
+    hideLoading() {
+        const messages = document.getElementById('aiMessages');
+        const welcome = messages?.querySelector('.welcome-message');
+        if (welcome) {
+            welcome.style.display = 'none';
+        }
+    }
+
+    showError(message) {
+        const messages = document.getElementById('aiMessages');
+        if (messages) {
+            messages.innerHTML = `
+                <div class="error-message">
+                    <div class="error-icon">❌</div>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
     }
 
     async sendMessage() {
-        const input = document.getElementById('aiChatInput');
-        const message = input.value.trim();
+        const input = document.getElementById('aiInput');
+        const message = input?.value.trim();
         
         if (!message || this.isProcessing) return;
         
-        this.showMessage('user', message);
         input.value = '';
-        
         this.isProcessing = true;
+        
+        // 顯示使用者訊息
+        this.addUserMessage(message);
+        
+        // 顯示打字中
         this.showTyping();
         
         try {
-            // 使用 Groq AI - 讓 LLM 自己決定如何回應
             const response = await this.callGroqAI(message);
             this.hideTyping();
-            this.showAIResponse(response, message, 'groq');
+            this.showAIResponse(response, 'groq');
         } catch (error) {
-            console.error('Groq AI 錯誤:', error);
+            console.error('AI 錯誤:', error);
             this.hideTyping();
-            
-            // 顯示具體錯誤訊息
-            this.showMessage('system', `❌ Groq AI 錯誤：${error.message || '未知錯誤'}`);
-            this.showMessage('system', '⚠️ 改用本地智慧搜尋...');
             
             // 自動回退到本地搜尋
             const response = this.performLocalSearch(message);
-            this.showAIResponse(response, message, 'local');
+            this.showAIResponse(response, 'local');
         }
         
         this.isProcessing = false;
     }
 
-    // 混合 AI：本地搜尋全部 1217 筆 → 給 LLM 分析前 100 個最相關的
     async callGroqAI(userQuestion) {
-        // 第一步：從全部 1217 筆中找出最相關的 30 個
         const allResults = this.performLocalSearch(userQuestion, 30);
         
-        // 如果本地搜尋沒有結果，傳前 30 筆完整資料給 LLM（讓它自由回應）
         let context;
         if (!allResults.recommendations || allResults.recommendations.length === 0) {
-            // 沒有相關結果，傳完整資料庫的前 30 筆
             const first30 = this.errorCodes.slice(0, 30);
             context = `這是完整的 Error Code 資料庫（前 30 筆）：\n\n` + 
                 first30.map((item, idx) => 
                     `${idx + 1}. ${item.code}: ${item.description} (Category: ${item.category})`
                 ).join("\n");
         } else {
-            // 有相關結果，傳最相關的 30 個
             const topCandidates = allResults.recommendations.slice(0, 30);
             context = `從 ${this.errorCodes.length} 筆資料中，找到以下 ${topCandidates.length} 個最相關的候選（按相關度排序）：\n\n` + 
                 topCandidates.map((rec, idx) => 
@@ -125,7 +138,6 @@ class AIAssistant {
                 ).join("\n");
         }
         
-        // 第二步：呼叫 Groq 讓 Llama 3 分析
         const url = `${this.API_BASE_URL}?action=askAI`;
         
         const response = await fetch(url, {
@@ -139,24 +151,18 @@ class AIAssistant {
             })
         });
         
-        console.log("Sending context to Llama 3 for analysis...");
-        
         const result = await response.json();
         
         if (!result.success) {
-            // Groq 失敗，回傳本地搜尋的前 15 個結果
-            console.warn("Groq failed, using local results");
-            const localTop15 = {
+            console.warn('Groq failed, using local results');
+            return JSON.stringify({
                 ...allResults,
                 recommendations: allResults.recommendations ? allResults.recommendations.slice(0, 15) : []
-            };
-            return JSON.stringify(localTop15);
+            });
         }
         
-        // 成功：回傳 Llama 3 的精選結果（按分數排序）
         const finalResults = result.data.recommendations || (allResults.recommendations ? allResults.recommendations.slice(0, 15) : []);
         
-        // 確保有分數並排序
         const sortedResults = finalResults.map(rec => ({
             ...rec,
             score: rec.score || (rec.confidence === '高' ? 80 : rec.confidence === '中' ? 50 : 20)
@@ -169,12 +175,10 @@ class AIAssistant {
         });
     }
 
-    // 本地智慧搜尋（回退方案）
-    async performLocalSearch(userInput, maxResults = 15) {
+    performLocalSearch(userInput, maxResults = 15) {
         const userLower = userInput.toLowerCase();
         const keywords = userLower.split(/\s+/).filter(w => w.length >= 2);
         
-        // 中文→英文關鍵字映射
         const chineseToEnglish = {
             '相機': ['camera', 'photo', 'picture', 'image', 'lens', 'pt'],
             '電源': ['power', 'voltage', 'battery', 'electric', 'supply', 'current'],
@@ -200,7 +204,6 @@ class AIAssistant {
             '電話': ['dect', 'voip', 'phone', 'voice']
         };
         
-        // 擴展關鍵字
         let expandedKeywords = [...keywords];
         for (const [chinese, englishList] of Object.entries(chineseToEnglish)) {
             if (userLower.includes(chinese)) {
@@ -208,7 +211,6 @@ class AIAssistant {
             }
         }
         
-        // 計算每個 Error Code 的分數
         const scored = this.errorCodes.map(item => {
             let score = 0;
             const descLower = item.description.toLowerCase();
@@ -228,18 +230,14 @@ class AIAssistant {
             return { ...item, score };
         });
         
-        // 過濾並排序
         const results = scored
             .filter(item => item.score > 0)
             .sort((a, b) => b.score - a.score)
             .slice(0, maxResults);
         
-        // 呼叫 AI 翻譯結果（非同步）
-        const translatedResults = await this.translateDescriptions(results);
-        
         return {
             thinking: `我分析了你的問題「${userInput}」，從 ${this.errorCodes.length} 筆 Error Code 資料中搜尋並比對關鍵字。`,
-            recommendations: translatedResults.map(item => ({
+            recommendations: results.map(item => ({
                 code: item.code,
                 reason: item.description,
                 reason_zh: item.description_zh || item.description,
@@ -253,57 +251,47 @@ class AIAssistant {
         };
     }
 
-    // 使用 AI 翻譯 Error Code 描述
-    async translateDescriptions(results) {
-        if (!results || results.length === 0) return results;
+    addUserMessage(message) {
+        const messages = document.getElementById('aiMessages');
+        if (!messages) return;
         
-        try {
-            // 批量翻譯：將所有描述組合成一個請求
-            const textsToTranslate = results.map(r => r.description);
-            const url = `${this.API_BASE_URL}?action=translate`;
-            
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({
-                    texts: JSON.stringify(textsToTranslate)
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success && result.translations) {
-                // 將翻譯結果對應回原始資料
-                results.forEach((item, index) => {
-                    if (result.translations[index]) {
-                        item.description_zh = result.translations[index];
-                    }
-                });
-                console.log(`✅ AI 翻譯完成：${results.length} 筆`);
-            }
-        } catch (error) {
-            console.warn('AI 翻譯失敗，使用原文:', error);
-            // 翻譯失敗不影響搜尋結果，只是沒有中文
-        }
+        // 隱藏 welcome message
+        const welcome = messages.querySelector('.welcome-message');
+        if (welcome) welcome.style.display = 'none';
         
-        return results;
+        const userDiv = document.createElement('div');
+        userDiv.className = 'message user-message';
+        userDiv.innerHTML = `
+            <div class="message-content">${this.escapeHtml(message)}</div>
+        `;
+        messages.appendChild(userDiv);
+        this.scrollToBottom();
     }
 
-    // 建立 Error Code 上下文
-    buildContext() {
-        const maxItems = 100;
-        const codes = this.errorCodes.slice(0, maxItems);
+    showTyping() {
+        const messages = document.getElementById('aiMessages');
+        if (!messages) return;
         
-        return codes.map(item => 
-            `- ${item.code}: ${item.description} (Category: ${item.category})`
-        ).join('\n');
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message ai-message typing';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerHTML = `
+            <div class="typing-dots">
+                <span></span><span></span><span></span>
+            </div>
+        `;
+        messages.appendChild(typingDiv);
+        this.scrollToBottom();
     }
 
-    // 顯示 AI 回應
-    showAIResponse(responseOrText, userQuestion, mode) {
-        const messagesContainer = document.getElementById('aiChatMessages');
+    hideTyping() {
+        const typing = document.getElementById('typingIndicator');
+        if (typing) typing.remove();
+    }
+
+    showAIResponse(responseOrText, mode) {
+        const messages = document.getElementById('aiMessages');
+        if (!messages) return;
         
         let response;
         if (typeof responseOrText === 'string') {
@@ -321,36 +309,39 @@ class AIAssistant {
             response = responseOrText;
         }
         
+        const aiDiv = document.createElement('div');
+        aiDiv.className = 'message ai-message';
+        
         let html = '';
         
         if (response.thinking) {
             html += `
-                <div class="ai-thinking">
-                    <div class="thinking-header">🤔 分析 ${mode === 'groq' ? '🚀' : '🔍'}</div>
-                    <div class="thinking-content">${this.escapeHtml(response.thinking)}</div>
+                <div class="thinking-box">
+                    <div class="thinking-label">🤔 分析</div>
+                    <div class="thinking-text">${this.escapeHtml(response.thinking)}</div>
                 </div>
             `;
         }
         
         if (response.recommendations && response.recommendations.length > 0) {
-            html += `<div class="ai-recommendations-title">🎯 推薦的 Error Code（${response.recommendations.length} 筆）</div>`;
-            html += `<div class="recommendation-cards">`;
+            html += `<div class="results-label">🎯 推薦的 Error Code（${response.recommendations.length} 筆）</div>`;
+            html += `<div class="results-grid">`;
             
             response.recommendations.forEach((rec) => {
                 const confidenceColor = rec.confidence === '高' ? '#28a745' : 
                                        rec.confidence === '中' ? '#ffc107' : '#6c757d';
                 
                 html += `
-                    <div class="recommendation-card" onclick="aiAssistant.copyToClipboard('${this.escapeHtml(rec.code)}')" title="點擊複製">
-                        <div class="recommendation-header">
-                            <span class="recommendation-code">${this.escapeHtml(rec.code)}</span>
-                            <span class="confidence-badge" style="background: ${confidenceColor}">${rec.confidence || '無'}</span>
+                    <div class="result-card" onclick="aiAssistant.copyCode('${this.escapeHtml(rec.code)}')">
+                        <div class="card-header">
+                            <span class="code">${this.escapeHtml(rec.code)}</span>
+                            <span class="confidence" style="background: ${confidenceColor}">${rec.confidence || '無'}</span>
                         </div>
-                        <div class="recommendation-reason">
-                            <div class="reason-en">${this.escapeHtml(rec.reason)}</div>
-                            <div class="reason-zh">${this.escapeHtml(rec.reason_zh || rec.reason)}</div>
+                        <div class="card-body">
+                            <div class="desc-en">${this.escapeHtml(rec.reason)}</div>
+                            <div class="desc-zh">${this.escapeHtml(rec.reason_zh || rec.reason)}</div>
                         </div>
-                        ${rec.score ? `<div class="recommendation-score">匹配分數：${rec.score}</div>` : ''}
+                        ${rec.score ? `<div class="card-score">匹配分數：${rec.score}</div>` : ''}
                     </div>
                 `;
             });
@@ -360,89 +351,33 @@ class AIAssistant {
         
         if (response.suggestions) {
             html += `
-                <div class="ai-suggestions">
-                    <div class="suggestions-content">${this.escapeHtml(response.suggestions)}</div>
+                <div class="suggestions-box">
+                    ${this.escapeHtml(response.suggestions)}
                 </div>
             `;
         }
         
-        const avatar = mode === 'groq' ? '🚀' : '🔍';
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'chat-message ai';
-        messageDiv.innerHTML = `
-            <div class="chat-avatar">${avatar}</div>
-            <div class="chat-bubble gemini-response">${html}</div>
-        `;
-        
-        messagesContainer.appendChild(messageDiv);
+        aiDiv.innerHTML = html;
+        messages.appendChild(aiDiv);
         this.scrollToBottom();
     }
 
-    showMessage(type, content) {
-        const messagesContainer = document.getElementById('aiChatMessages');
-        
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${type}`;
-        
-        if (type === 'user') {
-            messageDiv.innerHTML = `
-                <div class="chat-bubble">${this.escapeHtml(content)}</div>
-                <div class="chat-avatar">👤</div>
-            `;
-        } else if (type === 'system') {
-            messageDiv.innerHTML = `
-                <div class="chat-avatar">⚙️</div>
-                <div class="chat-bubble">${this.escapeHtml(content)}</div>
-            `;
-        }
-        
-        messagesContainer.appendChild(messageDiv);
-        this.scrollToBottom();
-    }
-
-    showTyping() {
-        const messagesContainer = document.getElementById('aiChatMessages');
-        
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'chat-message ai typing';
-        typingDiv.id = 'aiTyping';
-        typingDiv.innerHTML = `
-            <div class="chat-avatar">🤖</div>
-            <div class="ai-typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        `;
-        
-        messagesContainer.appendChild(typingDiv);
-        this.scrollToBottom();
-    }
-
-    hideTyping() {
-        const typing = document.getElementById('aiTyping');
-        if (typing) typing.remove();
-    }
-
-    copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            const messagesContainer = document.getElementById('aiChatMessages');
-            const toastDiv = document.createElement('div');
-            toastDiv.className = 'chat-message ai';
-            toastDiv.innerHTML = `
-                <div class="chat-avatar">✅</div>
-                <div class="chat-bubble" style="font-size: 0.9em;">已複製 <strong>${text}</strong> 到剪貼簿!</div>
-            `;
-            messagesContainer.appendChild(toastDiv);
-            this.scrollToBottom();
-            
-            setTimeout(() => toastDiv.remove(), 3000);
+    copyCode(code) {
+        navigator.clipboard.writeText(code).then(() => {
+            // 短暫顯示複製成功
+            const toast = document.createElement('div');
+            toast.className = 'copy-toast';
+            toast.textContent = `✅ 已複製 ${code}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
         });
     }
 
     scrollToBottom() {
-        const messagesContainer = document.getElementById('aiChatMessages');
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        const messages = document.getElementById('aiMessages');
+        if (messages) {
+            messages.scrollTop = messages.scrollHeight;
+        }
     }
 
     escapeHtml(text) {
@@ -451,16 +386,28 @@ class AIAssistant {
         div.textContent = text;
         return div.innerHTML;
     }
-
-    toggleMinimize() {
-        const container = document.getElementById('aiAssistant');
-        if (container) {
-            container.classList.toggle('minimized');
-        }
-    }
 }
 
 let aiAssistant;
+
+// 全域函數
+function askQuestion(question) {
+    const input = document.getElementById('aiInput');
+    if (input) {
+        input.value = question;
+        aiAssistant?.sendMessage();
+    }
+}
+
+function toggleBulkSection() {
+    const content = document.getElementById('bulkContent');
+    const icon = document.getElementById('bulkToggleIcon');
+    if (content && icon) {
+        const isHidden = content.style.display === 'none';
+        content.style.display = isHidden ? 'block' : 'none';
+        icon.textContent = isHidden ? '▲' : '▼';
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     aiAssistant = new AIAssistant();
