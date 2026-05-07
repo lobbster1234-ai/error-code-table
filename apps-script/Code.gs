@@ -16,6 +16,7 @@
  * GET /exec?action=getByCode&code=NT001 - 根據代碼查詢
  * GET /exec?action=search&q=keyword - 關鍵字搜尋
  * GET /exec?action=getCategories - 獲取所有類別
+ * GET /exec?action=askAI&question=xxx&context=xxx - AI 問答（Groq Llama 3）
  */
 
 // Google Sheet ID（部署後會自動使用綁定的表格）
@@ -286,11 +287,11 @@ function deleteErrorCode(code) {
  */
 function askAI(question, context) {
   try {
-    // Groq API Key - 請替換成你的 Key
-    const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE'; // ⚠️ 請改成你的 Groq API Key
-    const MODEL = 'llama-3.3-70b-versatile'; // 或 llama-3.1-8b-instant（更快）
+    // Groq API Key
+    const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE';
+    const MODEL = 'llama-3.3-70b-versatile';
     
-    // 組合 prompt（給 LLM 完全自由）
+    // 組合 prompt
     const systemPrompt = `你是製造測試設備的 Error Code 助理，也是一個友善的 AI 助手。
 
 你的任務：
@@ -308,11 +309,11 @@ ${context}
 
 回應格式（JSON，不要 markdown）：
 {
-  "thinking": "簡短說明你的判斷",
-  "recommendations": [
-    {"code": "代碼", "reason": "為什麼適合", "confidence": "高/中/低"}
-  ],
-  "suggestions": "給用戶的建議或回覆"
+ "thinking": "簡短說明你的判斷",
+ "recommendations": [
+ {"code": "代碼", "reason": "為什麼適合", "confidence": "高/中/低"}
+ ],
+ "suggestions": "給用戶的建議或回覆"
 }`;
     
     const userPrompt = `用戶問題："${question}"\n\n請分析並推薦最相關的 Error Code。`;
@@ -328,7 +329,6 @@ ${context}
       ],
       temperature: 0.3,
       max_tokens: 1024
-      // 注意：Groq 不支援 response_format: { type: 'json_object' }
     };
     
     const options = {
@@ -345,11 +345,9 @@ ${context}
     const responseCode = response.getResponseCode();
     const resultText = response.getContentText();
     
-    // 記錄原始回應（用於除錯）
     console.log('Groq API Response Code:', responseCode);
     console.log('Groq API Response:', resultText.substring(0, 500));
     
-    // 如果 HTTP 狀態碼不是 200，回傳錯誤
     if (responseCode !== 200) {
       return jsonResponse({ 
         success: false, 
@@ -368,23 +366,18 @@ ${context}
       });
     }
     
-    // 解析 Groq 回應
     const content = result.choices?.[0]?.message?.content || '{}';
     
-    // 嘗試解析 JSON
     let aiResponse;
     try {
-      // 確保內容是 JSON
       const jsonStr = content.replace(/```json\n?|\n?```/g, '').trim();
       aiResponse = JSON.parse(jsonStr);
       
-      // 驗證必要欄位
       if (!aiResponse.thinking) aiResponse.thinking = 'AI 已分析您的問題';
       if (!aiResponse.recommendations) aiResponse.recommendations = [];
       if (!aiResponse.suggestions) aiResponse.suggestions = '';
       
     } catch (e) {
-      // JSON 解析失敗，建立結構化回應
       aiResponse = {
         thinking: 'AI 已分析您的問題，但回應格式需要調整',
         recommendations: [],
@@ -415,7 +408,6 @@ ${context}
 function submitRequest(params) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   
-  // 獲取或創建 Requests 工作表
   let requestSheet = ss.getSheetByName('Requests');
   if (!requestSheet) {
     requestSheet = ss.insertSheet('Requests');
@@ -432,24 +424,21 @@ function submitRequest(params) {
       'ApprovedDate',
       'ResponseMessage'
     ]);
-    // 設定欄位寬度
-    requestSheet.setColumnWidth(1, 80);  // RequestID
-    requestSheet.setColumnWidth(2, 100); // Code
-    requestSheet.setColumnWidth(3, 300); // Description
-    requestSheet.setColumnWidth(4, 150); // Category
-    requestSheet.setColumnWidth(5, 300); // Notes
-    requestSheet.setColumnWidth(6, 200); // RequesterEmail
-    requestSheet.setColumnWidth(7, 120); // RequestDate
-    requestSheet.setColumnWidth(8, 100); // Status
-    requestSheet.setColumnWidth(9, 150); // ApprovedBy
-    requestSheet.setColumnWidth(10, 120); // ApprovedDate
-    requestSheet.setColumnWidth(11, 300); // ResponseMessage
+    requestSheet.setColumnWidth(1, 80);
+    requestSheet.setColumnWidth(2, 100);
+    requestSheet.setColumnWidth(3, 300);
+    requestSheet.setColumnWidth(4, 150);
+    requestSheet.setColumnWidth(5, 300);
+    requestSheet.setColumnWidth(6, 200);
+    requestSheet.setColumnWidth(7, 120);
+    requestSheet.setColumnWidth(8, 100);
+    requestSheet.setColumnWidth(9, 150);
+    requestSheet.setColumnWidth(10, 120);
+    requestSheet.setColumnWidth(11, 300);
   }
   
-  // 生成唯一請求 ID
   const requestId = 'REQ-' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd-HHmmss') + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
   
-  // 準備資料列
   const newRow = [
     requestId,
     params.code,
@@ -458,16 +447,14 @@ function submitRequest(params) {
     params.notes || '',
     params.requesterEmail,
     new Date(),
-    'pending', // Status: pending, approved, rejected
-    '', // ApprovedBy
-    '', // ApprovedDate
-    '' // ResponseMessage
+    'pending',
+    '',
+    '',
+    ''
   ];
   
-  // 寫入工作表
   requestSheet.appendRow(newRow);
   
-  // 發送通知郵件給 Real 哥
   try {
     const subject = `[Error Code 申請] 新請求 ${requestId} - ${params.code}`;
     const body = `
@@ -497,22 +484,20 @@ Email：${params.requesterEmail}
 ━━━━━━━━━━━━━━━━━━━━━
 
 1. 查看申請清單：
-   ${ss.getUrl()}#gid=${requestSheet.getSheetId()}
+ ${ss.getUrl()}#gid=${requestSheet.getSheetId()}
 
 2. 審核完成後，請回覆申請人並更新工作表「Status」欄位。
 
 此郵件由 Error Code 批量比對系統自動發送。
-    `;
+`;
     
-    // 發送給 Real 哥（這裡改成實際的 Email）
     MailApp.sendEmail({
-      to: 'real@example.com', // ⚠️ 請改成 Real 哥的真實 Email
+      to: 'real@example.com',
       subject: subject,
       body: body,
       name: 'Error Code 系統通知'
     });
     
-    // 同時發送副本給申請人
     MailApp.sendEmail({
       to: params.requesterEmail,
       subject: `[Error Code 申請已提交] ${requestId}`,
@@ -528,13 +513,12 @@ Email：${params.requesterEmail}
 
 ━━━━━━━━━━━━━━━━━━━━━
 Error Code 批量比對系統
-      `,
+`,
       name: 'Error Code 系統通知'
     });
     
   } catch (emailError) {
     console.error('郵件發送失敗:', emailError);
-    // 郵件失敗不影響 API 回應，但會記錄在日誌
   }
   
   return jsonResponse({
@@ -564,12 +548,10 @@ function batchImport(jsonData) {
       .findIndex(row => row[0] === item.code);
     
     if (existingIndex >= 0) {
-      // 更新
       sheet.getRange(existingIndex + 2, 2).setValue(item.description);
       sheet.getRange(existingIndex + 2, 3).setValue(item.category);
       updated++;
     } else {
-      // 新增
       sheet.appendRow([item.code, item.description, item.category, new Date()]);
       imported++;
     }
@@ -588,21 +570,18 @@ function batchImport(jsonData) {
 function initializeSheets() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   
-  // 創建錯誤代碼表
   let errorSheet = ss.getSheetByName('ErrorCodes');
   if (!errorSheet) {
     errorSheet = ss.insertSheet('ErrorCodes');
     errorSheet.appendRow(['Code', 'Description', 'Category', 'CreatedAt']);
   }
   
-  // 創建類別表
   let categorySheet = ss.getSheetByName('Categories');
   if (!categorySheet) {
     categorySheet = ss.insertSheet('Categories');
     categorySheet.appendRow(['Code', 'Name', 'Description']);
   }
   
-  // 填入預設類別
   const categories = [
     ['NT', 'RF Test Function Issue', '無線電頻率測試相關錯誤'],
     ['NE', 'EEPROM Issue', 'EEPROM 讀寫錯誤'],

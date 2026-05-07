@@ -10,7 +10,6 @@ class AIAssistant {
 
     async init() {
         console.log('🤖 AI 助理初始化中...');
-        this.showLoading();
         await this.loadData();
         this.setupUI();
         console.log('✅ AI 助理準備完成');
@@ -29,13 +28,12 @@ class AIAssistant {
                     description_zh: item.Description_ZH || item.Description_zh
                 }));
                 console.log(`✅ 載入 ${this.errorCodes.length} 筆 Error Code`);
-                this.hideLoading();
             } else {
-                this.showError('載入資料失敗');
+                this.showMessage('system', `❌ API 回應錯誤：${JSON.stringify(data)}`);
             }
         } catch (error) {
             console.error('載入資料失敗:', error);
-            this.showError('無法連接到伺服器');
+            this.showMessage('system', `❌ 載入失敗：${error.message}`);
         }
     }
 
@@ -58,35 +56,15 @@ class AIAssistant {
     }
 
     showLoading() {
-        const messages = document.getElementById('aiMessages');
-        if (messages) {
-            messages.innerHTML = `
-                <div class="loading-message">
-                    <div class="loading-icon">⏳</div>
-                    <p>載入中...</p>
-                </div>
-            `;
-        }
+        // 不再使用，改為直接顯示 welcome message
     }
 
     hideLoading() {
-        const messages = document.getElementById('aiMessages');
-        const welcome = messages?.querySelector('.welcome-message');
-        if (welcome) {
-            welcome.style.display = 'none';
-        }
+        // 不再使用
     }
 
     showError(message) {
-        const messages = document.getElementById('aiMessages');
-        if (messages) {
-            messages.innerHTML = `
-                <div class="error-message">
-                    <div class="error-icon">❌</div>
-                    <p>${message}</p>
-                </div>
-            `;
-        }
+        this.showMessage('system', `❌ ${message}`);
     }
 
     async sendMessage() {
