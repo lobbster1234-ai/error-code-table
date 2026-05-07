@@ -6,6 +6,7 @@
     <title>Error Code 批量比對系統</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/bulk-compare.css">
+    <link rel="stylesheet" href="css/ai-assistant.css">
 </head>
 <body>
     <div class="container">
@@ -125,5 +126,24 @@ Power Calibration Fail"></textarea>
 
     <script src="js/fuzzy-search.js"></script>
     <script src="js/bulk-compare.js"></script>
+    <script src="js/ai-assistant.js"></script>
+
+    <!-- AI 助理 -->
+    <div id="aiAssistant" class="ai-assistant-container">
+        <div class="ai-header" onclick="aiAssistant.toggleMinimize()">
+            <h3><span class="ai-status"></span> 🤖 AI 助理</h3>
+            <button class="minimize-btn">−</button>
+        </div>
+        <div class="ai-chat-messages" id="aiChatMessages"></div>
+        <div class="ai-quick-hints">
+            <button class="ai-quick-hint-btn">相機測試錯誤</button>
+            <button class="ai-quick-hint-btn">電源相關</button>
+            <button class="ai-quick-hint-btn">通訊問題</button>
+        </div>
+        <div class="ai-input-area">
+            <textarea id="aiChatInput" placeholder="描述你的問題..." rows="1"></textarea>
+            <button id="aiSendBtn" class="ai-send-btn">➤</button>
+        </div>
+    </div>
 </body>
 </html>

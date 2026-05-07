@@ -16,10 +16,16 @@
  * GET /exec?action=getByCode&code=NT001 - 根據代碼查詢
  * GET /exec?action=search&q=keyword - 關鍵字搜尋
  * GET /exec?action=getCategories - 獲取所有類別
+ * GET /exec?action=askAI&question=xxx&context=xxx - AI 問答（Groq Llama 3）
  */
 
 // Google Sheet ID（部署後會自動使用綁定的表格）
 const SHEET_ID = SpreadsheetApp.getActiveSpreadsheet().getId();
+
+// Groq API 設定
+const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 function doGet(e) {
   const action = e.parameter.action;
@@ -57,6 +63,10 @@ function doPost(e) {
         return deleteErrorCode(e.parameter.code);
       case 'batchImport':
         return batchImport(e.postData.contents);
+      case 'translate':
+        return translateTexts(e.postData.contents);
+      case 'askAI':
+        return askAI(e.parameter.question, e.parameter.context);
       default:
         return jsonResponse({ error: 'Unknown action' }, 400);
     }
@@ -275,6 +285,45 @@ function deleteErrorCode(code) {
 }
 
 /**
+ * 批量翻譯（使用 Google Translate API）
+ */
+function translateTexts(jsonData) {
+  try {
+    const data = JSON.parse(jsonData);
+    const texts = data.texts || [];
+    
+    if (!texts || texts.length === 0) {
+      return jsonResponse({ success: false, error: 'No texts to translate' });
+    }
+    
+    // 使用 Google Apps Script 內建的翻譯服務
+    const translations = texts.map(text => {
+      try {
+        // 翻譯成繁體中文
+        return LanguageApp.translate(text, 'en', 'zh-TW');
+      } catch (e) {
+        console.error('Translation error:', e);
+        return text; // 翻譯失敗回傳原文
+      }
+    });
+    
+    console.log(`✅ 翻譯完成：${translations.length} 筆`);
+    
+    return jsonResponse({
+      success: true,
+      translations: translations
+    });
+    
+  } catch (error) {
+    console.error('Batch translate error:', error);
+    return jsonResponse({ 
+      success: false, 
+      error: error.message 
+    }, 500);
+  }
+}
+
+/**
  * 批量匯入
  */
 function batchImport(jsonData) {
@@ -390,6 +439,117 @@ function exportData() {
     count: errorCodes.length,
     data: errorCodes
   });
+}
+
+// ===== AI 助理 - Groq Llama 3 =====
+
+/**
+ * AI 問答（使用 Groq Llama 3）
+ */
+function askAI(question, context) {
+  try {
+    if (!question) {
+      return jsonResponse({ success: false, error: 'Question is required' }, 400);
+    }
+    
+    // 建構系統提示
+    const systemPrompt = `你是 Error Code 查詢助理。你的任務是根據使用者問題和提供的上下文，從錯誤代碼清單中找出最相關的項目。
+
+你必須嚴格遵守以下輸出格式（只回傳 JSON，不要有任何其他文字）：
+{
+  "thinking": "你的分析過程，簡短說明如何匹配",
+  "recommendations": [
+    {"code": "代碼", "reason": "為什麼這個代碼相關", "confidence": "高/中/低"},
+    ...
+  ],
+  "suggestions": "給使用者的建議或補充說明"
+}
+
+請從提供的上下文（最多 30 個候選）中，挑選最相關的 10 個（或少於 10 個如果相關的不足 10 個）。
+按照相關程度由高到低排序。confidence 高適用於完全匹配的，中適用於部分匹配的，低適用於模糊匹配的。`;
+
+    // 建構使用者訊息
+    const userMessage = `問題：${question}\n\n上下文：\n${context}`;
+    
+    // 呼叫 Groq API
+    const response = UrlFetchApp.fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage }
+        ],
+        temperature: 0.3,
+        max_tokens: 2000
+      }),
+      muteHttpExceptions: true
+    });
+    
+    const responseCode = response.getResponseCode();
+    const responseText = response.getContentText();
+    
+    if (responseCode !== 200) {
+      console.error('Groq API 錯誤:', responseCode, responseText);
+      return jsonResponse({ 
+        success: false, 
+        error: `Groq API 錯誤: ${responseCode}`,
+        recommendations: []
+      });
+    }
+    
+    const result = JSON.parse(responseText);
+    
+    if (result.error) {
+      console.error('Groq 回傳錯誤:', result.error);
+      return jsonResponse({ 
+        success: false, 
+        error: result.error.message || result.error,
+        recommendations: []
+      });
+    }
+    
+    // 解析 LLM 回應
+    const llmContent = result.choices[0].message.content;
+    
+    // 嘗試解析 JSON
+    let recommendations;
+    try {
+      // 找出 JSON 區塊
+      const jsonMatch = llmContent.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        recommendations = parsed;
+      } else {
+        throw new Error('No JSON found');
+      }
+    } catch (parseError) {
+      console.error('JSON 解析失敗:', parseError);
+      return jsonResponse({ 
+        success: false, 
+        error: 'LLM 回應格式錯誤',
+        rawResponse: llmContent,
+        recommendations: []
+      });
+    }
+    
+    return jsonResponse({
+      success: true,
+      data: recommendations
+    });
+    
+  } catch (error) {
+    console.error('askAI 函數錯誤:', error);
+    return jsonResponse({ 
+      success: false, 
+      error: error.message || '未知錯誤',
+      recommendations: []
+    }, 500);
+  }
 }
 
 // ===== 輔助函數 =====
