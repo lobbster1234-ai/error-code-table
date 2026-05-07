@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
+    background: linear-gradient(135deg, #FFDDAA 0%, #FFC078 100%);
     min-height: 100vh;
     padding: 20px;
     color: #333;
@@ -22,7 +22,7 @@ body {
 }
 
 header {
-    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
+    background: linear-gradient(135deg, #FFDDAA 0%, #FFC078 100%);
     color: white;
     padding: 40px;
     text-align: center;
@@ -31,7 +31,8 @@ header {
 header h1 {
     font-size: 2.5em;
     margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    color: #5a4a00;
+    text-shadow: none;
 }
 
 .subtitle {
@@ -64,7 +65,7 @@ header h1 {
 
 #searchInput:focus {
     outline: none;
-    border-color: #8DB600;
+    border-color: #FFDDAA;
     box-shadow: 0 0 0 3px rgba(141, 182, 0, 0.2);
 }
 
@@ -79,7 +80,7 @@ button {
 }
 
 #searchBtn {
-    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
+    background: linear-gradient(135deg, #FFDDAA 0%, #FFC078 100%);
     color: white;
 }
 
@@ -201,7 +202,7 @@ button {
 }
 
 .compare-btn {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #FFAA55 0%, #FFC078 100%);
     color: white;
     width: 100%;
     padding: 15px;

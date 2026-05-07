@@ -31,7 +31,7 @@
 
 #bulkInput:focus {
     outline: none;
-    border-color: #8DB600;
+    border-color: #FFDDAA;
     box-shadow: 0 0 0 3px rgba(141, 182, 0, 0.1);
 }
 
@@ -42,7 +42,7 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
+    background: linear-gradient(135deg, #FFDDAA 0%, #FFC078 100%);
     color: white;
     border: none;
     padding: 15px 40px;
@@ -96,7 +96,7 @@
 }
 
 .stat-item.exact {
-    border-color: #28a745;
+    border-color: #FFAA55;
     background: linear-gradient(135deg, #d4edda 0%, #f8fff9 100%);
 }
 
@@ -118,7 +118,7 @@
 }
 
 .stat-item.exact .stat-number {
-    color: #28a745;
+    color: #FFAA55;
 }
 
 .stat-item.fuzzy .stat-number {
@@ -157,7 +157,7 @@
 .table-header {
     display: grid;
     grid-template-columns: 150px 120px 1fr 150px;
-    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
+    background: linear-gradient(135deg, #FFDDAA 0%, #FFC078 100%);
     color: white;
     font-weight: bold;
     padding: 15px;
@@ -191,7 +191,7 @@
 .col-code {
     font-family: 'Courier New', monospace;
     font-weight: bold;
-    color: #8DB600;
+    color: #FFDDAA;
 }
 
 .col-desc {
@@ -248,7 +248,7 @@
 }
 
 .match-number {
-    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
+    background: linear-gradient(135deg, #FFDDAA 0%, #FFC078 100%);
     color: white;
     width: 40px;
     height: 40px;
@@ -265,7 +265,7 @@
     font-family: 'Courier New', monospace;
     font-size: 1.4em;
     font-weight: bold;
-    color: #8DB600;
+    color: #FFDDAA;
     min-width: 100px;
 }
 
@@ -286,7 +286,7 @@
     padding: 10px 15px;
     background: #f8f9fa;
     border-radius: 6px;
-    border-left: 3px solid #8DB600;
+    border-left: 3px solid #FFDDAA;
 }
 
 .match-category {
@@ -372,12 +372,12 @@
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #8DB600;
+    border-color: #FFDDAA;
 }
 
 .btn-submit {
     width: 100%;
-    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
+    background: linear-gradient(135deg, #FFDDAA 0%, #FFC078 100%);
     color: white;
     border: none;
     padding: 15px;
@@ -402,7 +402,7 @@
 }
 
 .btn-export {
-    background: linear-gradient(135deg, #8DB600 0%, #5A7D00 100%);
+    background: linear-gradient(135deg, #FFDDAA 0%, #FFC078 100%);
     color: white;
     border: none;
     padding: 15px 40px;
