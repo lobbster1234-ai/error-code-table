@@ -9,6 +9,9 @@ class ErrorCodeRAGApp {
         this.isProcessing = false;
         this.currentLang = 'zh';
         
+        // GAS Proxy URL
+        this.GAS_URL = 'https://script.google.com/macros/s/AKfycbwQlNiZ_YNiCNME9Ie7vP7REQXERaYUZaGb78LoeFBiNQk5m-t_kss06mRQmFNiTpzT/exec';
+        
         // Language configurations
         this.langConfig = {
             zh: {
@@ -69,13 +72,55 @@ class ErrorCodeRAGApp {
     async init() {
         console.log('🚀 Initializing Error Code RAG App...');
         
-        // Initialize RAG system
-        await this.rag.init();
+        // 從 GAS 抓取最新資料並初始化 RAG
+            const result = await this.fetchGASData();
+            await this.rag.initWithData(result.data);
         
         // Setup UI
         this.setupUI();
         
         console.log('✅ App ready');
+    }
+    
+    /**
+     * 從 GAS 抓取最新 Error Code 資料
+     */
+    async fetchGASData() {
+        try {
+            console.log('📥 Loading data from Google Sheet...');
+            
+            // 從 GAS 抓取最新資料
+            const response = await fetch(`${this.GAS_URL}?action=getSheetData`);
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error);
+            }
+            
+            console.log(`✅ Loaded ${result.count} error codes from Google Sheet`);
+            
+            // 儲存到 localStorage 快取
+            localStorage.setItem('error_codes_cache', JSON.stringify({
+                data: result.data,
+                timestamp: Date.now()
+            }));
+            
+            return result;
+            
+        } catch (error) {
+            console.error('❌ Failed to load from GAS:', error);
+            
+            // 如果失敗，嘗試使用快取
+            const cached = localStorage.getItem('error_codes_cache');
+            if (cached) {
+                const { data, timestamp } = JSON.parse(cached);
+                const hoursAgo = Math.round((Date.now() - timestamp) / (1000 * 60 * 60) * 10) / 10;
+                console.log(`⚠️ Using cached data (${hoursAgo}h ago)`);
+                return { success: true, data, count: data.length };
+            }
+            
+            throw error;
+        }
     }
 
     setupUI() {

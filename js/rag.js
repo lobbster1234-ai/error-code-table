@@ -20,21 +20,32 @@ class ErrorCodeRAG {
     }
 
     /**
-     * Initialize the RAG system
+     * Initialize the RAG system with dynamic data
+     * @param {Array} data - Array of {code, description, category} from GAS
      */
-    async init() {
-        console.log('🔍 Initializing RAG system...');
+    async initWithData(data) {
+        console.log('🔍 Initializing RAG system with dynamic data...');
         this.isLoading = true;
         
         try {
-            // Load pre-computed embeddings
-            await this.loadEmbeddings();
+            // Load pre-computed embeddings (code + embedding only)
+            const embeddingData = await this.loadEmbeddings();
             
-            // Load metadata
-            this.metadata = await this.loadJSON('./embeddings/metadata.json');
+            // Create a map of code -> embedding
+            const embeddingMap = {};
+            embeddingData.forEach(item => {
+                embeddingMap[item.code] = item.embedding;
+            });
+            
+            // Merge GAS data with embeddings
+            this.embeddings = data.map(item => ({
+                code: item.code,
+                description: item.description || item.category || 'No description',
+                category: item.category || '',
+                embedding: embeddingMap[item.code] || null
+            })).filter(item => item.embedding !== null); // Only keep items with embeddings
             
             console.log(`✅ RAG system ready: ${this.embeddings.length} error codes loaded`);
-            console.log(`   Model: ${this.metadata?.model || 'unknown'}`);
             this.isLoading = false;
             return true;
         } catch (error) {
@@ -46,11 +57,13 @@ class ErrorCodeRAG {
 
     /**
      * Load pre-computed embeddings from JSON
+     * @returns {Array} - Array of {code, embedding}
      */
     async loadEmbeddings() {
         const response = await fetch('./embeddings/error_codes_embedded.json');
-        this.embeddings = await response.json();
-        console.log(`📦 Loaded ${this.embeddings.length} embeddings`);
+        const data = await response.json();
+        console.log(`📦 Loaded ${data.length} embeddings`);
+        return data;
     }
 
     /**
