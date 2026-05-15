@@ -347,17 +347,20 @@ class ErrorCodeRAGApp {
             html += `<div class="results-grid">`;
             
             searchResults.forEach((result) => {
+                // 確保一定有 code 和 description
+                const code = result.code || 'N/A';
+                const description = result.description || 'No description available';
                 const confidence = result.similarity > 0.7 ? 'high' : result.similarity > 0.4 ? 'medium' : 'low';
                 const confidenceText = this.getConfidenceText(confidence);
                 
                 html += `
-                    <div class="result-card" onclick="app.copyCode('${this.escapeHtml(result.code)}')">
+                    <div class="result-card" onclick="app.copyCode('${this.escapeHtml(code)}')">
                         <div class="card-header">
-                            <span class="code">${this.escapeHtml(result.code)}</span>
+                            <span class="code">${this.escapeHtml(code)}</span>
                             <span class="confidence confidence-${confidence}">${confidenceText}</span>
                         </div>
                         <div class="card-body">
-                            <div class="desc-en">${this.escapeHtml(result.description)}</div>
+                            <div class="desc-en">${this.escapeHtml(description)}</div>
                         </div>
                         <div class="card-score">${this.getSimilarityLabel()}: ${(result.similarity * 100).toFixed(1)}%</div>
                     </div>
