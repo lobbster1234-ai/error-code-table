@@ -206,57 +206,50 @@ class ErrorCodeRAGApp {
     }
 
     async callGroqAPI(userQuery, searchResults) {
-        // Get Groq API key from localStorage or environment
-        const apiKey = localStorage.getItem('groq_api_key') || '';
+        // GAS Proxy URL
+        const GAS_PROXY_URL = 'https://script.google.com/macros/s/AKfycbwQlNiZ_YNiCNME9Ie7vP7REQXERaYUZaGb78LoeFBiNQk5m-t_kss06mRQmFNiTpzT/exec';
         
         // Prepare context from search results
         const context = searchResults.map((result, idx) => 
             `${idx + 1}. ${result.code}: ${result.description} (相似度: ${(result.similarity * 100).toFixed(1)}%)`
         ).join('\n');
-
-        const systemPrompt = this.getSystemPrompt();
         
-        // If no API key, return local results only
-        if (!apiKey) {
+        // Check if using proxy or direct API
+        if (GAS_PROXY_URL.includes('YOUR_GAS_DEPLOYMENT_ID')) {
+            // Fallback to local results if GAS not configured
             return {
                 type: 'local',
                 thinking: this.getThinkingText(userQuery),
                 results: searchResults
             };
         }
-
+        
         try {
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            const response = await fetch(GAS_PROXY_URL, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: 'llama-3.1-8b-instant',
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: `用戶問題: ${userQuery}\n\n相關錯誤代碼:\n${context}\n\n請分析這些錯誤代碼，並給出最相關的建議。` }
-                    ],
-                    max_tokens: 2000,
-                    temperature: 0.3
+                    query: userQuery,
+                    context: context,
+                    language: this.currentLang
                 })
             });
-
-            if (!response.ok) {
-                throw new Error(`API error: ${response.status}`);
-            }
-
+            
             const data = await response.json();
-            return {
-                type: 'groq',
-                thinking: this.getThinkingText(userQuery),
-                analysis: data.choices[0].message.content,
-                results: searchResults
-            };
-
+            
+            if (data.success) {
+                return {
+                    type: 'groq',
+                    thinking: this.getThinkingText(userQuery),
+                    analysis: data.analysis,
+                    results: searchResults
+                };
+            }
+            
+            throw new Error(data.error);
+            
         } catch (error) {
-            console.warn('Groq API error, falling back to local:', error);
+            console.warn('GAS Proxy error, falling back to local:', error);
             return {
                 type: 'local',
                 thinking: this.getThinkingText(userQuery),
