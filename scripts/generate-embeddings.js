@@ -42,17 +42,31 @@ async function generateEmbeddings() {
     
     for (let i = 0; i < errorCodes.length; i += batchSize) {
         const batch = errorCodes.slice(i, i + batchSize);
-        const texts = batch.map(item => item.description);
+        
+        // 處理沒有 description 的資料
+        const texts = batch.map(item => {
+            const prefix = item.code.match(/^[A-Z]+/)?.[0] || '';
+            const categoryName = data.categories[prefix] || 'Unknown Issue';
+            // 如果沒有 description，使用類別名稱
+            return item.description && item.description.trim() !== '' 
+                ? item.description 
+                : `${categoryName} (${item.code})`;
+        });
         
         // Generate embeddings for batch
         const results = await embedder(texts, { pooling: 'mean', normalize: true });
         
         batch.forEach((item, idx) => {
             const embedding = Array.from(results[idx]);
+            const prefix = item.code.match(/^[A-Z]+/)?.[0] || '';
+            const categoryName = data.categories[prefix] || 'Unknown Issue';
+            
             embeddings.push({
                 code: item.code,
-                description: item.description,
-                category: item.category || '',
+                description: item.description && item.description.trim() !== '' 
+                    ? item.description 
+                    : categoryName,
+                category: categoryName,
                 embedding: embedding
             });
         });
