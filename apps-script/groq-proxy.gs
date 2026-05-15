@@ -20,20 +20,12 @@ function getGroqApiKey() {
   }
   return key;
 }
+
+/**
+ * Web App 入口點
+ * @param {Object} e - HTTP 請求參數
+ */
 function doPost(e) {
-  // CORS 處理
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json'
-  };
-  
-  if (e.method === 'OPTIONS') {
-    return ContentService.createTextOutput('')
-      .setHeaders(headers);
-  }
-  
   try {
     const requestData = JSON.parse(e.postData.contents);
     const { query, context, language } = requestData;
@@ -64,19 +56,20 @@ function doPost(e) {
     
     const groqData = JSON.parse(response.getContentText());
     
-    return ContentService.createTextOutput(JSON.stringify({
+    // 使用 HtmlOutput 並設置 headers
+    const output = ContentService.createTextOutput(JSON.stringify({
       success: true,
       analysis: groqData.choices[0].message.content,
       model: 'llama-3.1-8b-instant'
-    }))
-    .setHeaders(headers);
+    }));
+    
+    return output;
     
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({
       success: false,
       error: error.toString()
-    }))
-    .setHeaders(headers);
+    }));
   }
 }
 
@@ -84,11 +77,6 @@ function doPost(e) {
  * GET 請求 - 測試用
  */
 function doGet(e) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/json'
-  };
-  
   const action = e.parameter.action;
   
   if (action === 'ping') {
@@ -96,16 +84,14 @@ function doGet(e) {
       success: true,
       message: 'Groq Proxy 服務正常運行',
       version: '1.0.0'
-    }))
-    .setHeaders(headers);
+    }));
   }
   
   return ContentService.createTextOutput(JSON.stringify({
     success: true,
     message: 'Groq Proxy API',
     usage: 'POST 請求到這個 URL，包含 query, context, language 參數'
-  }))
-  .setHeaders(headers);
+  }));
 }
 
 /**

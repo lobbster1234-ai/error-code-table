@@ -9,6 +9,5 @@ __pycache__/
 .cache/
 *.tmp
 
-# 忽略大檔案（由 script 動態生成）
-embeddings/
+# 忽略原始資料檔（embeddings 需要上傳給 GitHub Pages）
 data/error_codes_raw.json
