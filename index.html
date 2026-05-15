@@ -3,20 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error Code 查詢系統 - AI 助理</title>
+    <title>Error Code RAG 查詢系統 - AI 助理</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/bulk-compare.css">
     <link rel="stylesheet" href="css/ai-assistant.css">
+    <link rel="stylesheet" href="css/rag-styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🤖 Error Code AI 查詢系統</h1>
+            <h1>🤖 Error Code RAG 查詢系統</h1>
             <p class="subtitle">用自然語言描述你的問題，AI 幫你找出最相關的 Error Code</p>
         </header>
 
-        <!-- 主要 AI 助理區塊 -->
+        <!-- 主要 RAG 查詢區塊 -->
         <div class="main-ai-section">
+            <!-- 語言選擇按鈕 -->
+            <div class="lang-selector">
+                <button class="lang-btn active" data-lang="zh" onclick="app.setLanguage('zh')">
+                    🇹🇼 中文
+                </button>
+                <button class="lang-btn" data-lang="en" onclick="app.setLanguage('en')">
+                    🇺🇸 English
+                </button>
+                <button class="lang-btn" data-lang="vi" onclick="app.setLanguage('vi')">
+                    🇻🇳 Tiếng Việt
+                </button>
+            </div>
+
             <div id="aiMainContainer" class="ai-main-container">
                 <div class="ai-messages" id="aiMessages">
                     <div class="welcome-message">
@@ -25,24 +39,25 @@
                             <h3>嗨！我是 Error Code 查詢助理</h3>
                             <p>你可以用自然語言描述問題，例如：</p>
                             <ul>
-                                <li>「相機測試失敗」</li>
-                                <li>「電源校正錯誤」</li>
-                                <li>「藍牙連線逾時」</li>
+                                <li>「相機測試失敗」 / "camera test failed" / "lỗi kiểm tra camera"</li>
+                                <li>「電源校正錯誤」 / "power calibration error" / "lỗi hiệu chỉnh nguồn"</li>
+                                <li>「藍牙連線逾時」 / "bluetooth timeout" / "hết thời gian kết nối bluetooth"</li>
                             </ul>
+                            <p class="hint-text">💡 支援中文、英文、越南語查詢</p>
                         </div>
                     </div>
                 </div>
                 <div class="ai-input-section">
                     <div class="quick-hints">
-                        <button class="hint-btn" onclick="askQuestion('相機測試錯誤')">📷 相機測試錯誤</button>
-                        <button class="hint-btn" onclick="askQuestion('電源供應問題')">⚡ 電源問題</button>
-                        <button class="hint-btn" onclick="askQuestion('網路連線失敗')">🌐 網路連線</button>
-                        <button class="hint-btn" onclick="askQuestion('藍牙配對失敗')">📶 藍牙失敗</button>
-                        <button class="hint-btn" onclick="askQuestion('記憶體讀寫錯誤')">💾 記憶體錯誤</button>
-                        <button class="hint-btn" onclick="askQuestion('校正逾時')">⏱️ 校正逾時</button>
+                        <button class="hint-btn" onclick="app.askQuestion('相機測試錯誤')">📷 相機測試錯誤</button>
+                        <button class="hint-btn" onclick="app.askQuestion('電源供應問題')">⚡ 電源問題</button>
+                        <button class="hint-btn" onclick="app.askQuestion('網路連線失敗')">🌐 網路連線</button>
+                        <button class="hint-btn" onclick="app.askQuestion('藍牙配對失敗')">📶 藍牙失敗</button>
+                        <button class="hint-btn" onclick="app.askQuestion('記憶體讀寫錯誤')">💾 記憶體錯誤</button>
+                        <button class="hint-btn" onclick="app.askQuestion('校正逾時')">⏱️ 校正逾時</button>
                     </div>
                     <div class="input-row">
-                        <textarea id="aiInput" placeholder="輸入你的問題..." rows="1"></textarea>
+                        <textarea id="aiInput" placeholder="輸入你的問題（支援中/英/越語言）..." rows="1"></textarea>
                         <button id="sendBtn" class="send-btn">➤</button>
                     </div>
                 </div>
@@ -108,45 +123,6 @@ Power Calibration Fail"></textarea>
                         <div id="notFoundList"></div>
                     </div>
 
-                    <div class="add-new-section" style="display:none;">
-                        <h4>📝 申請新增 Error Code</h4>
-                        <form id="newCodeForm">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Error Code *</label>
-                                    <input type="text" id="newCode" placeholder="例如：NT999" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>類別 *</label>
-                                    <select id="newCategory" required>
-                                        <option value="">選擇類別</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>錯誤描述 *</label>
-                                <input type="text" id="newDescription" placeholder="請輸入完整的錯誤描述" required>
-                            </div>
-                            <div class="form-group">
-                                <label>發現場景/補充說明</label>
-                                <textarea id="newNotes" rows="3" placeholder="請描述是在什麼情況下發現這個 Error Code..."></textarea>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>申請人 Email *</label>
-                                    <input type="email" id="requesterEmail" placeholder="your@email.com" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>申請日期</label>
-                                    <input type="date" id="requestDate" readonly>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn-submit">
-                                📧 提交申請（將發送審核郵件給管理員）
-                            </button>
-                        </form>
-                    </div>
-
                     <div class="export-section">
                         <button id="exportBtn" class="btn-export">📥 匯出比對結果（CSV）</button>
                     </div>
@@ -155,12 +131,11 @@ Power Calibration Fail"></textarea>
         </div>
 
         <footer>
-            <p>Error Code 查詢系統 | 資料來源：Google Sheets | AI 助理：Groq Llama 3</p>
+            <p>Error Code RAG 查詢系統 | 資料來源：Google Sheets | AI 助理：Groq Llama 3</p>
         </footer>
     </div>
 
-    <script src="js/fuzzy-search.js"></script>
-    <script src="js/bulk-compare.js"></script>
-    <script src="js/ai-assistant.js"></script>
+    <script src="js/rag.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>

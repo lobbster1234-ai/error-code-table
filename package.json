@@ -1,0 +1,20 @@
+{
+  "name": "error-code-rag-system",
+  "version": "2.0.0",
+  "description": "Error Code RAG Query System with multilingual support",
+  "main": "index.html",
+  "scripts": {
+    "generate": "node scripts/generate-embeddings.js"
+  },
+  "keywords": [
+    "error-codes",
+    "RAG",
+    "multilingual",
+    "AI"
+  ],
+  "author": "Stella",
+  "license": "MIT",
+  "devDependencies": {
+    "@xenova/transformers": "^2.17.2"
+  }
+}

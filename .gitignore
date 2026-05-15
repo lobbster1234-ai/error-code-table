@@ -8,3 +8,7 @@ __pycache__/
 *.pyc
 .cache/
 *.tmp
+
+# 忽略大檔案（由 script 動態生成）
+embeddings/
+data/error_codes_raw.json
