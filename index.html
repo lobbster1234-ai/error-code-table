@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error Code RAG 查詢系統 - AI 助理</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/bulk-compare.css">
     <link rel="stylesheet" href="css/ai-assistant.css">
     <link rel="stylesheet" href="css/rag-styles.css">
 </head>
@@ -59,72 +58,6 @@
                     <div class="input-row">
                         <textarea id="aiInput" placeholder="輸入你的問題（支援中/英/越語言）..." rows="1"></textarea>
                         <button id="sendBtn" class="send-btn">➤</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 批量比對區塊（折疊式） -->
-        <div class="bulk-section">
-            <button class="bulk-toggle" onclick="toggleBulkSection()">
-                <span>📋 批量比對（一次查多筆）</span>
-                <span class="toggle-icon" id="bulkToggleIcon">▼</span>
-            </button>
-            <div id="bulkContent" class="bulk-content" style="display: none;">
-                <div class="input-section">
-                    <p class="hint">貼上 Error Code 清單（每行一個）</p>
-                    <textarea id="bulkInput" placeholder="例如：
-NT001
-NT002
-Can't Open Adapter
-Power Calibration Fail"></textarea>
-                    <div class="button-group">
-                        <button id="compareBtn" class="btn-primary">🔍 開始比對</button>
-                        <button id="clearBtn" class="btn-secondary">清除</button>
-                    </div>
-                </div>
-
-                <div id="resultsSection" class="results-section" style="display: none;">
-                    <div class="stats-bar">
-                        <div class="stat-item exact">
-                            <span class="stat-number" id="exactCount">0</span>
-                            <span class="stat-label">✅ 完全匹配</span>
-                        </div>
-                        <div class="stat-item fuzzy">
-                            <span class="stat-number" id="fuzzyCount">0</span>
-                            <span class="stat-label">🔍 相近匹配</span>
-                        </div>
-                        <div class="stat-item notfound">
-                            <span class="stat-number" id="notFoundCount">0</span>
-                            <span class="stat-label">❌ 未找到</span>
-                        </div>
-                    </div>
-
-                    <div id="exactMatches" class="result-category">
-                        <h3>✅ 完全匹配</h3>
-                        <div class="results-table">
-                            <div class="table-header">
-                                <div class="col-input">輸入內容</div>
-                                <div class="col-code">Error Code</div>
-                                <div class="col-desc">描述</div>
-                                <div class="col-category">類別</div>
-                            </div>
-                            <div id="exactList" class="table-body"></div>
-                        </div>
-                    </div>
-
-                    <div id="fuzzyMatches" class="result-category">
-                        <h3>🔍 相近匹配（建議選項）</h3>
-                        <div id="fuzzyList"></div>
-                    </div>
-
-                    <div id="notFound" class="result-category">
-                        <h3>❌ 未找到匹配</h3>
-                        <div id="notFoundList"></div>
-                    </div>
-
-                    <div class="export-section">
-                        <button id="exportBtn" class="btn-export">📥 匯出比對結果（CSV）</button>
                     </div>
                 </div>
             </div>
